@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "pyseatrials"
+  site-url: "https://JonnoB.github.io/pyseatrials"
+  description: "A library of functions for understanding the performance of ships during commissioning sea trials"
+  repo-branch: main
+  repo-url: "https://github.com/JonnoB/pyseatrials"
