@@ -4,6 +4,11 @@
 __all__ = ['opposite_magnitude', 'adjacent_magnitude', 'law_of_cosines']
 
 # %% ../nbs/00_wind.ipynb 4
+import numpy as np
+import pandas as pd
+from fastcore.test import *
+
+# %% ../nbs/00_wind.ipynb 5
 def opposite_magnitude(magnitude:float, #The true speed 
                              angle:float, #The angle in radians
                             ):
@@ -13,7 +18,7 @@ def opposite_magnitude(magnitude:float, #The true speed
     
     return x
 
-# %% ../nbs/00_wind.ipynb 7
+# %% ../nbs/00_wind.ipynb 8
 def adjacent_magnitude(magnitude:float, # The true speed
                              angle:float, # The Ange in radians
                              ):
@@ -24,7 +29,7 @@ def adjacent_magnitude(magnitude:float, # The true speed
     
     return x
 
-# %% ../nbs/00_wind.ipynb 10
+# %% ../nbs/00_wind.ipynb 12
 def law_of_cosines(a:float, # side a which is along the x-axis
                    b:float, #side b makes the angle $\theta$ with side a
                    theta:float): #the angle in radians opposite side c
