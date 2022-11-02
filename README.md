@@ -28,5 +28,3 @@ import numpy as np
 ``` python
 law_of_cosines(3,4, np.pi/2)
 ```
-
-    NameError: name 'law_of_cosines' is not defined

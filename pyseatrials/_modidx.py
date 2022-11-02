@@ -5,6 +5,6 @@ d = { 'settings': { 'branch': 'main',
                 'doc_host': 'https://JonnoB.github.io',
                 'git_url': 'https://github.com/JonnoB/pyseatrials',
                 'lib_path': 'pyseatrials'},
-  'syms': { 'pyseatrials.wind': { 'pyseatrials.wind.adjacent_magnitude': ('wind.html#adjacent_magnitude', 'pyseatrials/wind.py'),
-                                  'pyseatrials.wind.law_of_cosines': ('wind.html#law_of_cosines', 'pyseatrials/wind.py'),
-                                  'pyseatrials.wind.opposite_magnitude': ('wind.html#opposite_magnitude', 'pyseatrials/wind.py')}}}
+  'syms': { 'pyseatrials.trig': { 'pyseatrials.trig.adjacent_magnitude': ('trig.html#adjacent_magnitude', 'pyseatrials/trig.py'),
+                                  'pyseatrials.trig.law_of_cosines': ('trig.html#law_of_cosines', 'pyseatrials/trig.py'),
+                                  'pyseatrials.trig.opposite_magnitude': ('trig.html#opposite_magnitude', 'pyseatrials/trig.py')}}}
