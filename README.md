@@ -19,12 +19,22 @@ pip install pyseatrials
 
 ## How to use
 
-Fill me in please! Don’t forget code examples:
+As an example here is the `law_of_cosines` from the `trig` module.
 
 ``` python
 import numpy as np
 ```
 
+In the first case the law of cosines is applied to a right angle
+triangle, simplifying it to pythagoras theorem
+
 ``` python
 law_of_cosines(3,4, np.pi/2)
+```
+
+In the second case the law of cosines in applied to $45^\circ$ or
+$\frac{\pi}{2}$
+
+``` python
+law_of_cosines(3,4, np.pi/4)
 ```
