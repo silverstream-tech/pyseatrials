@@ -11,7 +11,7 @@ from fastcore.test import *
 # %% ../nbs/00_trig.ipynb 6
 def opposite_magnitude_fn(magnitude:float, #The true speed 
                              angle:float, #The angle in radians
-                            ):
+                            ) -> int: #The vertical component of the magnitude
     "Product of sin and magnitude"
     
     x = magnitude * np.sin(angle)
@@ -21,7 +21,7 @@ def opposite_magnitude_fn(magnitude:float, #The true speed
 # %% ../nbs/00_trig.ipynb 9
 def adjacent_magnitude_fn(magnitude:float, # The true speed
                              angle:float, # The Ange in radians
-                             ):
+                             ) -> int: #The adjacent component of the magnitude
     
     "Product of cos and magnitude"
     
@@ -32,7 +32,8 @@ def adjacent_magnitude_fn(magnitude:float, # The true speed
 # %% ../nbs/00_trig.ipynb 13
 def law_of_cosines(a:float, # side a which is along the x-axis
                    b:float, #side b makes the angle $\theta$ with side a
-                   theta:float): #the angle in radians opposite side c
+                   theta:float  #the angle in radians opposite side c
+                  ) -> int: #The magnitude of b relative to a
     
     "Finds the length of side c using the angle theta opposite c and the length of the other two sides"
     
@@ -45,7 +46,8 @@ def law_of_cosines(a:float, # side a which is along the x-axis
 def find_gamma_fn(a:int, #magnitude of a 
                   b:int, #magnitude of b
                   alpha:int, # the angle between b and a in radians
-                  constrain_to_positive:bool = False): #Should the function return a value between 0 and 2 pi
+                  constrain_to_positive:bool = False #Should the function return a value between 0 and 2 pi
+                 ) -> int:   #the angle in radians between a and the relative magnitude of b
     
         adjacent_component = b - adjacent_magnitude_fn(a, alpha)
         opposite_component = opposite_magnitude_fn(a, alpha)

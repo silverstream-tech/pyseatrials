@@ -19,7 +19,9 @@ pip install pyseatrials
 
 ## How to use
 
-As an example here is the `law_of_cosines` from the `trig` module.
+As an example here is the
+[`law_of_cosines`](https://JonnoB.github.io/pyseatrials/trig.html#law_of_cosines)
+from the `pyseatrials.trig` module.
 
 ``` python
 import numpy as np
@@ -32,9 +34,13 @@ triangle, simplifying it to pythagoras theorem
 law_of_cosines(3,4, np.pi/2)
 ```
 
+    5.0
+
 In the second case the law of cosines in applied to $45^\circ$ or
 $\frac{\pi}{2}$
 
 ``` python
 law_of_cosines(3,4, np.pi/4)
 ```
+
+    2.833626166508712
