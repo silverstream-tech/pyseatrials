@@ -11,6 +11,11 @@ Currently only appendix ‘E’ Correcting for wind has been implemented
 
 The library is based on numpy and works with pandas
 
+## N.B
+
+This project is in early development. Function names and library
+structure may have breaking changes at anytime
+
 ## Install
 
 ``` sh
@@ -44,3 +49,16 @@ law_of_cosines(3,4, np.pi/4)
 ```
 
     2.833626166508712
+
+# What still needs to be implemented
+
+The following parts of ITTC need to be implemented as a minimum
+
+- Appendix F
+- Appendix G
+- Appendix J
+- kinamatic viscosity
+- reynolds number
+- Frictional resistance coefficient - ITTC 57
+- Froude number
+- roughness allowance
