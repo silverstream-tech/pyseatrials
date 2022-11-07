@@ -52,11 +52,11 @@ def CF_fn(reynolds_number:float, #indicating the type of flow of the water
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 26
 def roughness_allowence_fn(
-                          length:float, #Length of the vessel at waterline
+                          length:float, #Length of the vessel at waterline [m]
                           reynolds_number:float, # dimensionless value describing flow properties
-                          surface_roughness:float = 150e-6, #The default value is outdated an modern hull covering are likely considerably less rough
+                          surface_roughness:float = 150e-6, #The default value is outdated an modern hull covering are likely considerably less rough [m]
                           )-> float: #
     
-    ratio_value = (surface_roughness/ length)**(1/3)
-    return 0.0044 * (ratio_value - 10 * reynolds_number**(1/3)) + (1/8e3)
+    ratio_value = surface_roughness/ length
+    return 0.044 * (ratio_value**(1/3) - 10 * reynolds_number**(-1/3)) + (1/8e3)
     

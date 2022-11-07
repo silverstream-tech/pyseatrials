@@ -55,10 +55,8 @@ law_of_cosines(3,4, np.pi/4)
 The following parts of ITTC need to be implemented as a minimum
 
 - Appendix F
-- Appendix G
 - Appendix J
-- kinamatic viscosity
-- reynolds number
-- Frictional resistance coefficient - ITTC 57
-- Froude number
-- roughness allowance
+- Images
+  - Wind
+  - law of cosines
+  - STAWAVE-1
