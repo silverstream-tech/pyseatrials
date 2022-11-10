@@ -2,8 +2,9 @@
 
 # %% auto 0
 __all__ = ['correction_delivered_power', 'propulsive_efficiency_corr', 'full_scale_wake_fraction', 'full_scale_wake_speed',
-           'scale_correlation_factor', 'self_propulsion_factors', 'get_curve_coefficient', 'torque_coef',
-           'propeller_advance_coefficient', 'open_water_efficiency', 'propeller_flow']
+           'scale_correlation_factor', 'self_propulsion_factors', 'get_curve_coefficient', 'torque_coef', 'load_factor',
+           'load_factor_resistance', 'propeller_advance_coefficient', 'open_water_efficiency', 'propeller_flow',
+           'total_resistance', 'propeller_speed']
 
 # %% ../nbs/04_power.ipynb 3
 import numpy as np
@@ -73,9 +74,9 @@ def self_propulsion_factors(
     return x_ideal + delta_x * (delta_r/delta_r_ideal)
 
 # %% ../nbs/04_power.ipynb 33
-def get_curve_coefficient(y:float, #The dependent variable coefficient
-                      x:float #The propeller advance coefficient
-                     )->float: #returns model coefficients
+def get_curve_coefficient(y:float, #An array containing the dependent variable coefficient
+                      x:float, #An array containing the propeller advance coefficient
+                     )->float: #Returns an array containing model coefficients
     
     "Obtain the coefficients used to calculate the Thrus, and Torque coefficients and the load factor coefficients"
     
@@ -94,7 +95,7 @@ def get_curve_coefficient(y:float, #The dependent variable coefficient
     return b
     
 
-# %% ../nbs/04_power.ipynb 40
+# %% ../nbs/04_power.ipynb 41
 def torque_coef(power:float, #The delivered power
                      shaft_speed:float, #measure propeller shaft speed [rev/s]
                      diameter:float, #properller_diameter [m]
@@ -110,7 +111,30 @@ def torque_coef(power:float, #The delivered power
     
     
 
-# %% ../nbs/04_power.ipynb 45
+# %% ../nbs/04_power.ipynb 46
+def load_factor(thrust_coefficient:float, #The thrust coefficient
+               propeller_advance:float #The propeller advance coefficient
+               )->float: # dimensionless load factor
+    
+    "Calculate the load factor using the thrust and propeller advance coefficients"
+    
+    return thrust_coefficient/propeller_advance**2
+
+# %% ../nbs/04_power.ipynb 51
+def load_factor_resistance(
+                    resistance:float, # The total resistance experienced by the vessel
+                    thrust_deduction:float, #The thrust deduction factor
+                    wake_fraction:float, #The full-scale wake fraction
+                    stw:float, #Ships speed through water [m/s]
+                    diameter:float, #The diameter of the ships propeller
+                    water_density:float = 1026, #density of water in the given conditions [kg/m^3]
+    )-> float: #this value can be in the ideal condition or trial depending on parameters used
+    
+    "Calculate the load factor of the propeller. Usually used to find the load factor in the ideal condition"
+    
+    return resistance /( (1 - thrust_deduction) * (1- wake_fraction)**2 * water_density * stw**2 * diameter **2 )
+
+# %% ../nbs/04_power.ipynb 56
 def propeller_advance_coefficient(torque_coefficient:float, #The torque coefficient
                                   a:float, #coefficient 'a' from get_curve_coefficient
                                   b:float, #coefficient 'b' from get_curve_coefficient
@@ -123,7 +147,7 @@ def propeller_advance_coefficient(torque_coefficient:float, #The torque coeffici
     
     return (-b - square_root )/(2*a)
 
-# %% ../nbs/04_power.ipynb 50
+# %% ../nbs/04_power.ipynb 61
 def open_water_efficiency(propeller_advance_coef:float, #The propeller advance coefficient of the ship
                          thrust_coef:float, # thrust coefficient
                          torque_coef:float 
@@ -133,7 +157,7 @@ def open_water_efficiency(propeller_advance_coef:float, #The propeller advance c
     
     return (propeller_advance_coef/(2*np.pi))*(thrust_coef/torque_coef)
 
-# %% ../nbs/04_power.ipynb 55
+# %% ../nbs/04_power.ipynb 66
 def propeller_flow(
     propeller_advance_coef:float, #Propeller advance coefficient [n/a]
     rotations_sec:float, #propeller rotations per second [rev/sec]
@@ -142,4 +166,29 @@ def propeller_flow(
     
     "Calculate water flow into the propeller"
     
-    return propeller_advance_coef * rotations_sec *diameter
+    return propeller_advance_coef * rotations_sec * diameter
+
+# %% ../nbs/04_power.ipynb 71
+def total_resistance(
+                    load_factor:float, # The load factor
+                    thrust_deduction:float, #The thrust deduction factor
+                    wake_fraction:float, #The full-scale wake fraction
+                    stw:float, #Ships speed through water [m/s]
+                    diameter:float, #The diameter of the ships propeller
+                    water_density:float = 1026, #density of water in the given conditions [kg/m^3]
+    )-> float: #this value can be in the ideal condition or trial depending on parameters used
+    
+    "Calculate the total resistance of the ship. Used to find the resistance in the ideal condition"
+    
+    return load_factor * (1 - thrust_deduction) * (1- wake_fraction)**2 * water_density * stw**2 * diameter **2
+
+# %% ../nbs/04_power.ipynb 76
+def propeller_speed(
+        propeller_advance_coef:float, #Propeller advance coefficient [n/a]
+        stw:float, #The speed through water of the vessel [m/s]
+        diameter:float, #Diamter of the propeller [m]
+        wake_fraction:float, #The full scale wake fraction
+        )-> float: #Propeller speed in rotations per second
+    "Calculate the propeller speed in m/s"
+
+    return stw*(1-wake_fraction)/(propeller_advance_coef * diameter)

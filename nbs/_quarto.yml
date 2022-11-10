@@ -3,9 +3,10 @@ project:
 
 format:
   html:
-    theme: cosmo
+    theme: lux
     css: styles.css
     toc: true
+    number-sections: true
 
 website:
   twitter-card: true
