@@ -6,5 +6,4 @@ __all__ = []
 # %% ../nbs/05_wind_resistance_factors.ipynb 2
 import numpy as np
 import pandas as pd
-import pkg_resources
 from fastcore.test import *
