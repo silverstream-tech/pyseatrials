@@ -17,7 +17,7 @@ There full documentation is available at
 https://jonnob.github.io/pyseatrials/
 
 The library uses nbdev by fastdotai and most functions depend solely on
-numpy. Most of the functions allow for vectorisation.
+numpy.
 
 <div>
 
@@ -36,31 +36,64 @@ python -m pip install git+https://github.com/JonnoB/pyseatrials
 
 ## How to use
 
-As an example here is the
-[`law_of_cosines`](https://JonnoB.github.io/pyseatrials/trig.html#law_of_cosines)
-from the `pyseatrials.trig` module.
+As an example consider the problem of calculating resistance experienced
+by the ship from waves.
 
 ``` python
+from pyseatrials.wave import *
 import numpy as np
 ```
 
-In the first case the law of cosines is applied to a right angle
-triangle, simplifying it to pythagoras theorem
+To calculate the wave resistance experienced by a ship you can call the
+STAWAVE-1 function `stawave1`
 
 ``` python
-law_of_cosines(3,4, np.pi/2)
+stawave1_fn(beam = 20, wave_height =  3, length = 5)
 ```
 
-    5.0
+    23085.0
 
-In the second case the law of cosines in applied to $45^\circ$ or
-$\frac{\pi}{2}$
+STAWAVE-1 like almost all functions in `pyseatrials` are vectorised.
+This means if an array of values is used the function will return an
+array for all values entered. The example below shows the resistance in
+Newtons for a range of wave heights.
 
 ``` python
-law_of_cosines(3,4, np.pi/4)
+stawave1_fn(20, np.linspace(1, 3, 4), 5)
 ```
 
-    2.833626166508712
+    array([ 2565.,  7125., 13965., 23085.])
+
+<div>
+
+> **Note**
+>
+> Using an array follows standard Python broadcasting rules. So if you
+> enter an arrays in different arguments the arrays must have the same
+> length and the $i$th element of each array should refer to the same
+> vessel/state/etc
+
+</div>
+
+All functions are have documentation, in addition there is in depth
+documentation online
+([STAWAVE-1](https://jonnob.github.io/pyseatrials/wave_resistance.html#stawave1_fn)).
+
+``` python
+stawave1_fn?
+```
+
+    Signature:
+    stawave1_fn(
+        beam: float,
+        wave_height: float,
+        length: float,
+        water_density: float = 1026,
+        gravity: float = 9.81,
+    ) -> float
+    Docstring: STAWAVE-1 finds the resistance caused by bow waves for ships experiencing low heave and pitch
+    File:      /usr/local/lib/python3.9/dist-packages/pyseatrials/wave.py
+    Type:      function
 
 # Notes
 
