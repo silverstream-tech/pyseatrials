@@ -19,7 +19,14 @@ https://jonnob.github.io/pyseatrials/
 The library uses nbdev by fastdotai and most functions depend solely on
 numpy. Most of the functions allow for vectorisation.
 
-## N.B. This project is in early development. Function names and library structure may have breaking changes at anytime
+<div>
+
+> **Important**
+>
+> This project is in early development. Function names and library
+> structure may have breaking changes at anytime
+
+</div>
 
 ## Install
 
@@ -81,7 +88,6 @@ law_of_cosines(3,4, np.pi/4)
 The following parts of ITTC need to be implemented as a minimum
 
 - Appendix F
-- Appendix J
 - Images
   - Wind
   - law of cosines

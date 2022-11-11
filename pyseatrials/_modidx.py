@@ -63,4 +63,5 @@ d = { 'settings': { 'branch': 'main',
                                   'pyseatrials.wind.true_wind_speed_from_relative': ( 'wind.html#true_wind_speed_from_relative',
                                                                                       'pyseatrials/wind.py'),
                                   'pyseatrials.wind.vertical_position_anemometer': ( 'wind.html#vertical_position_anemometer',
-                                                                                     'pyseatrials/wind.py')}}}
+                                                                                     'pyseatrials/wind.py')},
+            'pyseatrials.wind_res': {}}}
