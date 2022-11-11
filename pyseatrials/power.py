@@ -2,9 +2,11 @@
 
 # %% auto 0
 __all__ = ['correction_delivered_power', 'propulsive_efficiency_corr', 'full_scale_wake_fraction', 'full_scale_wake_speed',
-           'scale_correlation_factor', 'self_propulsion_factors', 'get_curve_coefficient', 'torque_coef', 'load_factor',
-           'load_factor_resistance', 'propeller_advance_coefficient', 'open_water_efficiency', 'propeller_flow',
-           'total_resistance', 'propeller_speed']
+           'scale_correlation_factor', 'self_propulsion_factors', 'get_curve_coefficient', 'quadratic_method',
+           'torque_coef', 'load_factor', 'load_factor_resistance', 'propeller_advance_coefficient',
+           'open_water_efficiency', 'propeller_flow', 'total_resistance', 'propeller_speed',
+           'calculate_all_values_from_trial_phase', 'calculate_all_values_from_ideal_phase',
+           'delivered_power_ideal_condition']
 
 # %% ../nbs/04_power.ipynb 3
 import numpy as np
@@ -18,7 +20,7 @@ def correction_delivered_power(
     eta_id:float, #propulsive efficiency in the ideal conditions
     eta_ms:float, # propulsive efficiency in the seattrial
 
-)-> float:
+)-> float:# Returns the corrected delivered power in Newtons [N]
     
     "calculates the corrected delivered power, used as part of the direct power analysis"
     
@@ -81,7 +83,7 @@ def get_curve_coefficient(y:float, #An array containing the dependent variable c
     "Obtain the coefficients used to calculate the Thrus, and Torque coefficients and the load factor coefficients"
     
     #create the X matrix to have a quadratic form
-    X = np.concatenate((x**2,x, np.ones(len(x)))).reshape([3,10]).transpose()
+    X = np.concatenate((x**2,x, np.ones(len(x)))).reshape([3,len(x)]).transpose()
     #Get determinate
 
     square_mat = np.matmul(X.transpose(), X)
@@ -95,7 +97,16 @@ def get_curve_coefficient(y:float, #An array containing the dependent variable c
     return b
     
 
-# %% ../nbs/04_power.ipynb 41
+# %% ../nbs/04_power.ipynb 40
+def quadratic_method(coefs:float, #An array of the coefficients created by the function get_curve_coefficient
+                    propeller_advance_coef:float #The propeller advance coefficient
+                    )-> float: #The target value for the coefficient types entered
+    
+    "Calculate the coefficient using a modelled quadratic curve"
+    
+    return coefs[0] * propeller_advance_coef**2 + coefs[1] * propeller_advance_coef + coefs[2]
+
+# %% ../nbs/04_power.ipynb 45
 def torque_coef(power:float, #The delivered power
                      shaft_speed:float, #measure propeller shaft speed [rev/s]
                      diameter:float, #properller_diameter [m]
@@ -105,13 +116,13 @@ def torque_coef(power:float, #The delivered power
     
     "calcualte the torque coefficient under ideal or trial conditions"
     
-    denominator = 2 * np.pi * shaft_speed * diameter
+    denominator = 2 * np.pi * water_density * shaft_speed**3 * diameter**5
     
     return (power/denominator) *  efficiency
     
     
 
-# %% ../nbs/04_power.ipynb 46
+# %% ../nbs/04_power.ipynb 50
 def load_factor(thrust_coefficient:float, #The thrust coefficient
                propeller_advance:float #The propeller advance coefficient
                )->float: # dimensionless load factor
@@ -120,7 +131,7 @@ def load_factor(thrust_coefficient:float, #The thrust coefficient
     
     return thrust_coefficient/propeller_advance**2
 
-# %% ../nbs/04_power.ipynb 51
+# %% ../nbs/04_power.ipynb 55
 def load_factor_resistance(
                     resistance:float, # The total resistance experienced by the vessel
                     thrust_deduction:float, #The thrust deduction factor
@@ -134,20 +145,32 @@ def load_factor_resistance(
     
     return resistance /( (1 - thrust_deduction) * (1- wake_fraction)**2 * water_density * stw**2 * diameter **2 )
 
-# %% ../nbs/04_power.ipynb 56
-def propeller_advance_coefficient(torque_coefficient:float, #The torque coefficient
+# %% ../nbs/04_power.ipynb 60
+def propeller_advance_coefficient(propeller_value:float, #The torque coefficient or loading factor as appropriate
                                   a:float, #coefficient 'a' from get_curve_coefficient
                                   b:float, #coefficient 'b' from get_curve_coefficient
-                                  c:float #coefficient 'c' from get_curve_coefficient
-
-                                  ) -> float:
+                                  c:float, #coefficient 'c' from get_curve_coefficient
+                                  mode:str, #Does function use torque or load mode?
+                                  ) -> float: 
     
-    "Calculate the propeller advance coefficient for"
-    square_root = np.sqrt(b**2 - 4*a*(c - torque_coefficient))
+    "Calculate the propeller advance coefficient using a quadratic curve"
     
-    return (-b - square_root )/(2*a)
+    assert (mode == "torque") | (mode == "load")
+    
+    if mode =="torque":
+        
+        c = c - propeller_value
+        
+    elif mode == "load":
+    
+        a = a - propeller_value
+    
+    square_root = np.sqrt(b**2 - 4*a*c)
+    J = (-b - square_root )/(2*a)
+    
+    return J
 
-# %% ../nbs/04_power.ipynb 61
+# %% ../nbs/04_power.ipynb 68
 def open_water_efficiency(propeller_advance_coef:float, #The propeller advance coefficient of the ship
                          thrust_coef:float, # thrust coefficient
                          torque_coef:float 
@@ -157,32 +180,32 @@ def open_water_efficiency(propeller_advance_coef:float, #The propeller advance c
     
     return (propeller_advance_coef/(2*np.pi))*(thrust_coef/torque_coef)
 
-# %% ../nbs/04_power.ipynb 66
+# %% ../nbs/04_power.ipynb 73
 def propeller_flow(
     propeller_advance_coef:float, #Propeller advance coefficient [n/a]
     rotations_sec:float, #propeller rotations per second [rev/sec]
     diameter:float, #Diamter of the propeller [m]
     )-> float: #The value that comes out is in m3/s WHAT ARE THE UNITS?
     
-    "Calculate water flow into the propeller"
+    "Calculate speed of water flow into the propeller"
     
     return propeller_advance_coef * rotations_sec * diameter
 
-# %% ../nbs/04_power.ipynb 71
+# %% ../nbs/04_power.ipynb 78
 def total_resistance(
                     load_factor:float, # The load factor
                     thrust_deduction:float, #The thrust deduction factor
                     wake_fraction:float, #The full-scale wake fraction
                     stw:float, #Ships speed through water [m/s]
                     diameter:float, #The diameter of the ships propeller
-                    water_density:float = 1026, #density of water in the given conditions [kg/m^3]
+                    water_density:float = 1026 #density of water in the given conditions [kg/m^3]
     )-> float: #this value can be in the ideal condition or trial depending on parameters used
     
     "Calculate the total resistance of the ship. Used to find the resistance in the ideal condition"
     
     return load_factor * (1 - thrust_deduction) * (1- wake_fraction)**2 * water_density * stw**2 * diameter **2
 
-# %% ../nbs/04_power.ipynb 76
+# %% ../nbs/04_power.ipynb 83
 def propeller_speed(
         propeller_advance_coef:float, #Propeller advance coefficient [n/a]
         stw:float, #The speed through water of the vessel [m/s]
@@ -192,3 +215,187 @@ def propeller_speed(
     "Calculate the propeller speed in m/s"
 
     return stw*(1-wake_fraction)/(propeller_advance_coef * diameter)
+
+# %% ../nbs/04_power.ipynb 88
+def calculate_all_values_from_trial_phase(
+    V_s:float,
+    P_dms:float,
+    eta_ms:float,
+    delta_R:float,
+    R_id:float,
+    delta_eta :float,
+    delta_t:float, 
+    delta_w:float,
+    shaft_speed:float,
+    diameter:float,
+    e_i:float,
+    t_Rid:float,
+    w_Mid:float,
+    number_shafts:float,
+    K_T,
+    K_Q,
+    J,
+    water_density:float = 1026
+    ): #returns a dictionaryt of the ouput variables from the trial condition calculations
+    
+    "Perform all the calculations to get the 'trials conditions' values"
+    #These return the initia; value of eta/t/w, the function is used just to show, although it does nothing. This can be swapped out
+    eta_Rms = eta_ms
+    t_ms = t_Rid
+    w_Mms = w_Mid
+
+    K_Qms = torque_coef(P_dms, shaft_speed, diameter, eta_Rms, water_density)/number_shafts #two shafts
+
+
+    ## These two functions are the only bit that cannot be vectorised 
+    ##However these values are fixed from the test data so should be fixed for each ship, so vectorisation should be irrelevant
+    K_T_coeffs = get_curve_coefficient(K_T, J)
+    K_Q_coeffs = get_curve_coefficient(K_Q, J)
+
+    #not vectorised
+    J_ms = propeller_advance_coefficient(K_Qms, K_Q_coeffs[0], K_Q_coeffs[1], K_Q_coeffs[2], "torque"  )
+
+
+    K_Tms = quadratic_method(K_T_coeffs, J_ms)
+
+    tau_Pms = load_factor(K_Tms  , J_ms)
+
+
+    V_A = propeller_flow(J_ms, shaft_speed, diameter)
+
+    w_Sms = full_scale_wake_speed(V_A, V_s)
+
+    R_ms = total_resistance(tau_Pms, t_ms, w_Sms, V_s, diameter, water_density) *number_shafts #number of propellers
+
+    R_id = R_ms - delta_R
+
+    eta_Oms = open_water_efficiency(J_ms, K_Tms, K_Qms)  
+
+
+
+
+    eta_Rms = self_propulsion_factors(eta_ms, delta_eta, delta_R, R_id)
+    t_ms = self_propulsion_factors(t_Rid, delta_t, delta_R, R_id)
+    w_Mms = self_propulsion_factors(w_Mid, delta_w, delta_R, R_id)
+
+    eta_Dms = propulsive_efficiency_corr(eta_Oms, eta_Rms, t_ms, w_Sms)
+
+    e_ims = scale_correlation_factor(w_Sms, w_Mms)
+
+    w_Sid = full_scale_wake_fraction(w_Mid,e_ims)  
+    
+    trial_values = {'K_Qms':K_Qms, 'J_ms':J_ms, 'K_Tms':K_Tms, 'tau_Pms':tau_Pms, 'V_A':V_A, 'w_Sms':w_Sms, 
+                    'R_ms':R_ms, 'R_id':R_id, 'eta_Oms':eta_Oms, 'eta_Rms':eta_Rms, 't_ms':t_ms, 'w_Mms':w_Mms, 
+                    'eta_Dms':eta_Dms, 'e_ims':e_ims, 'w_Sid':w_Sid}
+    
+    return trial_values, [K_T_coeffs, K_Q_coeffs]
+    
+
+# %% ../nbs/04_power.ipynb 93
+def calculate_all_values_from_ideal_phase(
+        V_s:float,
+        P_dms:float,
+        delta_R:float,
+        shaft_speed:float,
+        diameter:float,
+        number_shafts:float,
+        t_Rid:float,
+        R_id:float, 
+        eta_Rms:float, 
+        eta_Dms:float, 
+        w_Sid:float,
+        K_T_coeffs,
+        K_Q_coeffs,
+        water_density:float = 1026
+        ): #returns a dictionaryt of the ouput variables from the trial condition calculations
+    
+    "intermediary function that calculates all the values in the ideal condition"
+
+    tau_Pid = load_factor_resistance(R_id , t_Rid, w_Sid, V_s, diameter, water_density)/number_shafts
+
+    #I don't really understand why the load factor uses the thrust coefficients
+    J_id = propeller_advance_coefficient(tau_Pid , K_T_coeffs[0], K_T_coeffs[1], K_T_coeffs[2], "load"  )
+
+    K_Tid = quadratic_method(K_T_coeffs, J_id)
+
+    K_Qid = quadratic_method(K_Q_coeffs, J_id)
+
+    eta_Oid = open_water_efficiency(J_id, K_Tid, K_Qid)
+
+    n_id = propeller_speed(J_id, V_s, diameter, w_Sid)
+
+    eta_Did = propulsive_efficiency_corr(eta_Oid , eta_Rms, t_Rid, w_Sid)
+
+    delta_P = correction_delivered_power(P_dms, delta_R, V_s, eta_Did, eta_Dms)
+    
+    ideal_values = {'tau_Pid':tau_Pid, 'J_id':J_id, 'K_Tid':K_Tid, 'K_Qid':K_Qid, 'eta_Oid':eta_Oid, 'n_id':n_id , 'eta_Did':eta_Did, 'delta_P':delta_P}
+    
+    return ideal_values
+
+# %% ../nbs/04_power.ipynb 100
+def delivered_power_ideal_condition(
+    V_s:float,
+    P_dms:float,
+    eta_ms:float,
+    delta_R:float,
+    R_id:float,
+    delta_eta :float,
+    delta_t:float, 
+    delta_w:float,
+    shaft_speed:float,
+    diameter:float,
+    e_i:float,
+    t_Rid:float,
+    w_Mid:float,
+    number_shafts:float,
+    K_T,
+    K_Q,
+    J,
+    water_density:float = 1026): #returns three results ideal_values, trial_values and the K coefficients
+    
+    "Calculate the delivered power in the Ideal conditions"
+
+    trial_values, K_coeffs = calculate_all_values_from_trial_phase(
+                V_s = V_s,
+                P_dms =P_dms ,
+                eta_ms = eta_ms ,
+                delta_R = delta_R ,
+                R_id = R_id,
+                delta_eta = delta_eta,
+                delta_t = delta_t,
+                delta_w = delta_w ,
+                shaft_speed = shaft_speed ,
+                diameter = diameter,
+                number_shafts = number_shafts ,
+                water_density = water_density ,
+                e_i = e_i,
+                t_Rid = t_Rid,
+                w_Mid = w_Mid ,
+                J = J,
+                K_T = K_T,
+                K_Q = K_Q
+    )
+
+
+
+
+
+
+    ideal_values = calculate_all_values_from_ideal_phase(
+                V_s = V_s,
+                P_dms = P_dms,
+                delta_R = delta_R ,
+                shaft_speed = shaft_speed ,
+                diameter = diameter, 
+                number_shafts = number_shafts,
+                t_Rid = t_Rid ,
+                R_id = trial_values['R_id'], 
+                eta_Rms = trial_values['eta_Rms'],
+                eta_Dms = trial_values['eta_Dms'],
+                w_Sid = trial_values['w_Sid'],
+                K_T_coeffs =  K_coeffs[0],
+                K_Q_coeffs =  K_coeffs[1],
+                water_density = water_density
+    )
+
+    return ideal_values, trial_values, K_coeffs
