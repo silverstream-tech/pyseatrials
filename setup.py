@@ -40,8 +40,8 @@ setuptools.setup(
     ] + ['Programming Language :: Python :: '+o for o in py_versions[py_versions.index(min_python):]] + (['License :: ' + lic[1] ] if lic[1] else []),
     url = cfg['git_url'],
     packages = setuptools.find_packages(),
-    include_package_data = True,
-    package_data={'': ['datasets/*.csv']},#manually added
+    #include_package_data = True,
+    #package_data={'': ['datasets/*.csv']},#manually added
     install_requires = requirements,
     extras_require={ 'dev': dev_requirements },
     dependency_links = cfg.get('dep_links','').split(),
