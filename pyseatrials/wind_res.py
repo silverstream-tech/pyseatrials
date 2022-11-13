@@ -9,6 +9,7 @@ import pandas as pd
 from fastcore.test import *
 import importlib.resources
 import os
+import pkgutil
 #import pkg_resources
 
 # %% ../nbs/05_wind_resistance_factors.ipynb 4
@@ -17,7 +18,7 @@ def load_wind_coefficients(vessel_type:str #The name of the vessel type. Must be
     
     "Loads a data frame of the wind coefficients for a range of angles of attack for the named vessel type"
     resource = vessel_type+".csv"
-    package = 'pyseatrials.datasets'
+    package = 'pyseatrials'
     if not importlib.resources.is_resource(package, resource):
         raise FileNotFoundError(f"Python package '{package}' resource '{resource}' not found.")
 
@@ -25,7 +26,9 @@ def load_wind_coefficients(vessel_type:str #The name of the vessel type. Must be
         
         return os.fspath(resource_path)
 
-    
+
+#res = pkgutil.get_data('sound.effects.cool_effects', 'collection_effects.csv')
+
 
 
 # %% ../nbs/05_wind_resistance_factors.ipynb 11
