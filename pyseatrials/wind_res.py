@@ -7,31 +7,18 @@ __all__ = ['load_wind_coefficients', 'interpolate_cx']
 import numpy as np
 import pandas as pd
 from fastcore.test import *
-import importlib.resources
-import os
 import pkgutil
-#import pkg_resources
+from io import BytesIO
 
 # %% ../nbs/05_wind_resistance_factors.ipynb 4
 def load_wind_coefficients(vessel_type:str #The name of the vessel type. Must be one of 9 options
-                     ):#returns a data set with where the first column us angle_of_attack in radians, the second is angle_of_attack in degrees, the subsequent columns names ship states
-    
-    "Loads a data frame of the wind coefficients for a range of angles of attack for the named vessel type"
-    resource = vessel_type+".csv"
-    package = 'pyseatrials'
-    if not importlib.resources.is_resource(package, resource):
-        raise FileNotFoundError(f"Python package '{package}' resource '{resource}' not found.")
-
-    with importlib.resources.path(package, resource) as resource_path:
+                     ): #returns a data set with where the first column us angle_of_attack in radians, the second is angle_of_attack in degrees, the subsequent columns names ship states
+        res = pkgutil.get_data('pyseatrials', 'datasets/'+vessel_type+'.csv')
         
-        return os.fspath(resource_path)
+        return pd.read_csv(BytesIO(res))
+    
 
-
-#res = pkgutil.get_data('sound.effects.cool_effects', 'collection_effects.csv')
-
-
-
-# %% ../nbs/05_wind_resistance_factors.ipynb 11
+# %% ../nbs/05_wind_resistance_factors.ipynb 8
 def interpolate_cx(df, #dataframe of the wind resistance dataset
                    relative_wind_direction:float, #The angle of the wind relative to the ship [rads]
                    ship_state:str #The state of the ship the resistance should be evaluated in. Chosen from the columns of the wind resistance datasets

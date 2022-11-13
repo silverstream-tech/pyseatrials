@@ -116,11 +116,12 @@ stawave1_fn?
   which can be scaled to better understand the real performance of the
   ship during seatrials.
 
-# What still needs to be implemented
+# To be done
 
-The following parts of ITTC need to be implemented as a minimum
+The following parts of ITTC need to be implemented
 
-- Appendix F
+- STAWAVE-2
+- Example ship data
 - Images
   - Wind
   - law of cosines
