@@ -9,7 +9,7 @@ import pandas as pd
 from fastcore.test import *
 #import pkg_resources
 
-# %% ../nbs/05_wind_resistance_factors.ipynb 9
+# %% ../nbs/05_wind_resistance_factors.ipynb 10
 def interpolate_cx(df, #dataframe of the wind resistance dataset
                    relative_wind_direction:float, #The angle of the wind relative to the ship [rads]
                    ship_state:str #The state of the ship the resistance should be evaluated in. Chosen from the columns of the wind resistance datasets
