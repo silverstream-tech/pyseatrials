@@ -122,6 +122,8 @@ stawave1_fn?
 The following parts of ITTC need to be implemented
 
 - STAWAVE-2
+- function that plots ship and wind/current/wave in both polar and
+  cartesian relative coordinates
 - Example ship data
 - Images
   - Wind

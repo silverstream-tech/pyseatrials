@@ -47,7 +47,7 @@ def CF_fn(reynolds_number:float, #indicating the type of flow of the water
     
     "An essential part of calculating the resistance experienced by the ship"
     
-    return 0.067 * (np.log10(reynolds_number) -2) ** 2 + adjustment_value   
+    return (1 + adjustment_value) * 0.067 / (np.log10(reynolds_number) -2) ** 2   
     
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 26
