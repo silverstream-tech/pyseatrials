@@ -49,7 +49,7 @@ def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient 
                                    #RF0:float, #frictional resistance for reference water temperature and salt content [N]
                                    #RT0:float, #total resistance for reference water temperature and salt content [N]
                                    S:float, #wetted surface area [m2]
-                                   VS:float, #ship’s speed through the water [m/s]
+                                   stw:float, #ship’s speed through the water [m/s]
                                    rho_S:float, #water density for actual water temperature and salt content [kg/m3 ]
                                    rho_0:float = 1026 #water density for reference water temperature and salt content                                  
                                   )-> float: #resistance increase due to deviation of water temperature and water density [N]
@@ -58,8 +58,8 @@ def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient 
     
     #This function can be re-written into sub-parts and all the sub-parts ouputted in a results matrix. 
     #Would this be useful?
-    RF = 0.5 * rho_S* S * VS**2 * (CF + delta_CF)
-    RT0 = 0.5 * rho_0 * S * VS**2 * CT0
+    RF = 0.5 * rho_S* S * stw**2 * (CF + delta_CF)
+    RT0 = 0.5 * rho_0 * S * stw**2 * CT0
     
     RAS =  RT0 * ( rho_S/rho_0 - 1 ) - RF* ( (CF0 + delta_CF0)/(CF + delta_CF) - 1 )
     

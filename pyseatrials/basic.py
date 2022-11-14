@@ -57,6 +57,6 @@ def roughness_allowence_fn(
                           surface_roughness:float = 150e-6, #The default value is outdated an modern hull covering are likely considerably less rough [m]
                           )-> float: #
     
-    ratio_value = surface_roughness/ length
+    ratio_value = surface_roughness / length
     return 0.044 * (ratio_value**(1/3) - 10 * reynolds_number**(-1/3)) + (1/8e3)
     

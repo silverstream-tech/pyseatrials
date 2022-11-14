@@ -28,13 +28,13 @@ numpy.
 
 </div>
 
-## Install
+# Install
 
 ``` sh
 python -m pip install git+https://github.com/JonnoB/pyseatrials 
 ```
 
-## How to use
+# How to use
 
 As an example consider the problem of calculating resistance experienced
 by the ship from waves.
@@ -45,7 +45,8 @@ import numpy as np
 ```
 
 To calculate the wave resistance experienced by a ship you can call the
-STAWAVE-1 function `stawave1`
+STAWAVE-1 function
+[`stawave1_fn`](https://JonnoB.github.io/pyseatrials/wave_resistance.html#stawave1_fn)
 
 ``` python
 stawave1_fn(beam = 20, wave_height =  3, length = 5)
@@ -102,8 +103,8 @@ stawave1_fn?
 - The library refers to ‘ITTC’ throughout, this always refers to
   ‘7.5-04-01-01.1 Preparation, Conduct and Analysis of Speed/Power
   Trials’
-- Where the equations are directly from ITTC they are marked **ITTC
-  equations**: x
+- Where the equations are directly from ITTC they are marked ‘**ITTC
+  equations**: x’
 - The library focuses on the equations needed to accurately measure
   performance during sea trials. However, many of these equations can be
   applied at other stages of measuring ship performance, e.g. model
