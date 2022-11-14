@@ -41,8 +41,7 @@ setuptools.setup(
     url = cfg['git_url'],
     packages = setuptools.find_packages(),
     include_package_data = True,
-    package_data={'': ['wind_coef_data/*.csv'],
-                 '': ['example_data/*.csv']},#manually added
+    package_data={"": ["datasets/*.csv", "wind_coef_data/*.csv"]},#manually added
     install_requires = requirements,
     extras_require={ 'dev': dev_requirements },
     dependency_links = cfg.get('dep_links','').split(),
