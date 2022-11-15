@@ -47,9 +47,6 @@ def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient 
                                    delta_CF:float, #roughness allowance associated with Reynolds number for actual water temperature and salinity
                                    delta_CF0:float,#roughness allowance associated with Reynolds number for reference water temperature and salinity
                                    CT0:float, #total resistance coefficient for reference water temperature and salinity
-                                   #RF:float, #frictional resistance for actual water temperature and salt content [N]
-                                   #RF0:float, #frictional resistance for reference water temperature and salt content [N]
-                                   #RT0:float, #total resistance for reference water temperature and salt content [N]
                                    S:float, #wetted surface area [m2]
                                    stw:float, #ship’s speed through the water [m/s]
                                    rho_S:float, #water density for actual water temperature and salt content [kg/m3 ]
@@ -68,7 +65,7 @@ def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient 
     return RAS
     
 
-# %% ../nbs/01_general_functions.ipynb 21
+# %% ../nbs/01_general_functions.ipynb 22
 def load_datasets(dataset:str #The name of the dataset to load
                      ): #returns a dataframe containing example data
         

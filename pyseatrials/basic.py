@@ -58,5 +58,5 @@ def roughness_allowence_fn(
                           )-> float: #
     
     ratio_value = surface_roughness / length
-    return 0.044 * (ratio_value**(1/3) - 10 * reynolds_number**(-1/3)) + (1/8e3)
+    return (11/250)* (ratio_value**(1/3) - 10 * reynolds_number**(-1/3)) + (1/8e3)
     
