@@ -41,7 +41,7 @@ def wind_resistance(air_density:float, #Air density [kg/$m^3$]
     
     return wind_resistance_val
 
-# %% ../nbs/01_general_functions.ipynb 17
+# %% ../nbs/01_general_functions.ipynb 16
 def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient for actual water temperature and salinity
                                    CF0:float, #frictional resistance coefficient for reference water temperature and salinity
                                    delta_CF:float, #roughness allowance associated with Reynolds number for actual water temperature and salinity
@@ -65,7 +65,7 @@ def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient 
     return RAS
     
 
-# %% ../nbs/01_general_functions.ipynb 22
+# %% ../nbs/01_general_functions.ipynb 21
 def load_datasets(dataset:str #The name of the dataset to load
                      ): #returns a dataframe containing example data
         

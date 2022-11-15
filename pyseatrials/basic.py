@@ -23,7 +23,7 @@ def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g
     
     return mu_w * (1 + A*salinity + B*salinity**2)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 13
+# %% ../nbs/98_basic_hydro_functions.ipynb 14
 def kinamatic_visocity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typically 1.18e-3 [kg/(ms)]
                           water_density:float = 1026 #The density of water under current conditions [kg/m^3]
                          )-> float: #[m^2/s]
@@ -33,7 +33,7 @@ def kinamatic_visocity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typi
     return dynamic_viscosity/water_density
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 20
+# %% ../nbs/98_basic_hydro_functions.ipynb 21
 def reynolds_number_fn(stw:float, #Speed through water [m/s]
                       length:float, #Length of the vessel, $L_{os}$ Length overall submerged is typically used [m]
                       kinamatic_viscosity:float # [m^2/s]
@@ -45,7 +45,7 @@ def reynolds_number_fn(stw:float, #Speed through water [m/s]
     
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 25
+# %% ../nbs/98_basic_hydro_functions.ipynb 26
 def froude_number_fn(stw:float, #speed through water [m/s]
                     length:float,#Length of vessel, typically $L_{wl}$ Length of waterline [m]
                     gravity:float = 9.81 #acceleration due to gravity [m/s^2]
@@ -55,7 +55,7 @@ def froude_number_fn(stw:float, #speed through water [m/s]
     
     return stw/np.sqrt(gravity * length)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 30
+# %% ../nbs/98_basic_hydro_functions.ipynb 31
 def CF_fn(reynolds_number:float, #indicating the type of flow of the water
        adjustment_value:float = 0.1194 # An adjustment value applied by testing company. Default if from ITTC 57
       )-> float: #This is a dimensionaless value
@@ -65,7 +65,7 @@ def CF_fn(reynolds_number:float, #indicating the type of flow of the water
     return (1 + adjustment_value) * 0.067 / (np.log10(reynolds_number) -2) ** 2   
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 34
+# %% ../nbs/98_basic_hydro_functions.ipynb 35
 def roughness_allowence_fn(
                           length:float, #Length of the vessel at waterline [m]
                           reynolds_number:float, # dimensionless value describing flow properties
