@@ -50,9 +50,10 @@ def relative_wind_speed_from_true(true_wind_speed:float, #The windspeed over gro
     
     "converts true windspeed to relative"
     
-    return law_of_cosines(true_wind_speed, sog,true_wind_direction - vessel_heading)
+    return np.sqrt(true_wind_speed**2 +sog**2 +2*true_wind_speed*sog*np.cos( true_wind_direction - vessel_heading))
+           
 
-# %% ../nbs/02_wind.ipynb 31
+# %% ../nbs/02_wind.ipynb 32
 def relative_wind_direction_from_true(
                             true_wind_speed:float, #The windspeed over ground
                             sog:float, #Speed over ground of the vessel
@@ -63,9 +64,9 @@ def relative_wind_direction_from_true(
     
     "converts true direction speed to relative"
     
-    return find_gamma_fn(sog,true_wind_speed, true_wind_direction- vessel_heading)
+    return find_gamma_fn(true_wind_speed, sog, true_wind_direction - vessel_heading)
 
-# %% ../nbs/02_wind.ipynb 38
+# %% ../nbs/02_wind.ipynb 39
 def vertical_position_anemometer(true_wind_speed:float, #True windspeed [m/s]
                                  reference_height:float, #reference heigh [m]
                                  measured_height:float  # measured height [m]

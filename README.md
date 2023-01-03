@@ -14,7 +14,7 @@ documented python library with examples and code testing for all
 functions.
 
 There full documentation is available at
-https://jonnob.github.io/pyseatrials/
+https://silverstream-tech.github.io/pyseatrials/
 
 The library uses nbdev by fastdotai and most functions depend solely on
 numpy.
@@ -31,7 +31,7 @@ numpy.
 # Install
 
 ``` sh
-python -m pip install git+https://github.com/JonnoB/pyseatrials 
+python -m pip install git+https://github.com/silverstream-tech/pyseatrials 
 ```
 
 # How to use
