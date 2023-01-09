@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>pyseatrials - Evaluation of wind data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="pyseatrials - Evaluation of wind data">
+<meta property="og:description" content="The two functions in this section convert relative wind speed and direction to thier True equivalents.">
+<meta property="og:site-name" content="pyseatrials">
+<meta name="twitter:title" content="pyseatrials - Evaluation of wind data">
+<meta name="twitter:description" content="The two functions in this section convert relative wind speed and direction to thier True equivalents.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pyseatrials</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Evaluation of wind data</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">pyseatrials</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general_functions.html" class="sidebar-item-text sidebar-link">General Functions</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind.html" class="sidebar-item-text sidebar-link active">Evaluation of wind data</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wave_resistance.html" class="sidebar-item-text sidebar-link">Wave Resistance</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./power.html" class="sidebar-item-text sidebar-link">Direct Power Analysis</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind_resistance_coef.html" class="sidebar-item-text sidebar-link">Wind resistance coefficients</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./full_example.html" class="sidebar-item-text sidebar-link">Which ship is best?</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic_hydro_functions.html" class="sidebar-item-text sidebar-link">Basic hydro functions</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./trig.html" class="sidebar-item-text sidebar-link">Useful trigonometry</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#true-wind" id="toc-true-wind" class="nav-link active" data-scroll-target="#true-wind"><span class="toc-section-number">1</span>  True Wind</a>
+  <ul class="collapse">
+  <li><a href="#speed" id="toc-speed" class="nav-link" data-scroll-target="#speed"><span class="toc-section-number">1.1</span>  Speed</a></li>
+  <li><a href="#true_wind_speed_from_relative" id="toc-true_wind_speed_from_relative" class="nav-link" data-scroll-target="#true_wind_speed_from_relative"><span class="toc-section-number">1.2</span>  true_wind_speed_from_relative</a></li>
+  <li><a href="#direction" id="toc-direction" class="nav-link" data-scroll-target="#direction"><span class="toc-section-number">1.3</span>  Direction</a></li>
+  <li><a href="#true_wind_direction_from_relative" id="toc-true_wind_direction_from_relative" class="nav-link" data-scroll-target="#true_wind_direction_from_relative"><span class="toc-section-number">1.4</span>  true_wind_direction_from_relative</a></li>
+  </ul></li>
+  <li><a href="#relative-wind" id="toc-relative-wind" class="nav-link" data-scroll-target="#relative-wind"><span class="toc-section-number">2</span>  Relative Wind</a>
+  <ul class="collapse">
+  <li><a href="#direction-1" id="toc-direction-1" class="nav-link" data-scroll-target="#direction-1"><span class="toc-section-number">2.1</span>  Direction</a></li>
+  <li><a href="#relative_wind_speed_from_true" id="toc-relative_wind_speed_from_true" class="nav-link" data-scroll-target="#relative_wind_speed_from_true"><span class="toc-section-number">2.2</span>  relative_wind_speed_from_true</a></li>
+  <li><a href="#direction-2" id="toc-direction-2" class="nav-link" data-scroll-target="#direction-2"><span class="toc-section-number">2.3</span>  Direction</a></li>
+  <li><a href="#relative_wind_direction_from_true" id="toc-relative_wind_direction_from_true" class="nav-link" data-scroll-target="#relative_wind_direction_from_true"><span class="toc-section-number">2.4</span>  relative_wind_direction_from_true</a></li>
+  </ul></li>
+  <li><a href="#correcting-for-the-height-of-the-anemometer" id="toc-correcting-for-the-height-of-the-anemometer" class="nav-link" data-scroll-target="#correcting-for-the-height-of-the-anemometer"><span class="toc-section-number">3</span>  Correcting for the height of the Anemometer</a>
+  <ul class="collapse">
+  <li><a href="#vertical_position_anemometer" id="toc-vertical_position_anemometer" class="nav-link" data-scroll-target="#vertical_position_anemometer"><span class="toc-section-number">3.1</span>  vertical_position_anemometer</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Evaluation of wind data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="true-wind" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="true-wind"><span class="header-section-number">1</span> True Wind</h2>
+<p>The two functions in this section convert relative wind speed and direction to thier True equivalents.</p>
+<section id="speed" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="speed"><span class="header-section-number">1.1</span> Speed</h3>
+<p>Calculating true windspeed from relative windspeed and direction</p>
+<p><strong>ITTC equations</strong>: E-2</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L15" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="true_wind_speed_from_relative" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="true_wind_speed_from_relative"><span class="header-section-number">1.2</span> true_wind_speed_from_relative</h3>
+<blockquote class="blockquote">
+<pre><code> true_wind_speed_from_relative (relative_windspeed:float, sog:float,
+                                relative_wind_direction:float)</code></pre>
+</blockquote>
+<p>converts a relative wind speed and direction to a true wind speed</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>relative_windspeed</td>
+<td>float</td>
+<td>speed of wind relative to ship</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td>speed over ground</td>
+</tr>
+<tr class="odd">
+<td>relative_wind_direction</td>
+<td>float</td>
+<td>wind direction relative to ship</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>True windspeed</strong></td>
+</tr>
+</tbody>
+</table>
+<p>If the wind is blowing has a relative angle of 0, (meaning the wind is blowing from the bow to the stern) and has a relative windspeed of 2 knots, then the true windspeed can be calculated as</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>true_wind_speed_from_relative(<span class="dv">2</span>, <span class="dv">20</span>, <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>18.0</code></pre>
+</div>
+</div>
+<p>Conversely if the wind is blowing from stern to bow this means the true windspeed is 22</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>true_wind_speed_from_relative(<span class="dv">2</span>, <span class="dv">20</span>, np.pi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>22.0</code></pre>
+</div>
+</div>
+<p>However if the relative angle is <span class="math inline">\(-45^\circ\)</span> then the true windspeed is</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>true_wind_speed_from_relative(<span class="dv">2</span>, <span class="dv">20</span>, <span class="op">-</span>np.pi<span class="op">/</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>18.63951333874026</code></pre>
+</div>
+</div>
+<p>Remember that windspeed is ALWAYS positive, the direction tells you if it is helping or hindering the ship</p>
+</section>
+<section id="direction" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="direction"><span class="header-section-number">1.3</span> Direction</h3>
+<p>How to calculate the true direction from the relative direction.</p>
+<p><strong>ITTC equations</strong>: E-3</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L23" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="true_wind_direction_from_relative" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="true_wind_direction_from_relative"><span class="header-section-number">1.4</span> true_wind_direction_from_relative</h3>
+<blockquote class="blockquote">
+<pre><code> true_wind_direction_from_relative (relative_wind_speed:float, sog:float,
+                                    relative_wind_direction:float,
+                                    vessel_heading:float,
+                                    constrain_to_positive:bool=True)</code></pre>
+</blockquote>
+<p>converts relative wind direction to true wind direction</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>relative_wind_speed</td>
+<td>float</td>
+<td></td>
+<td>Speed of the wind relative to the ship</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td></td>
+<td>Speed of the ship overground</td>
+</tr>
+<tr class="odd">
+<td>relative_wind_direction</td>
+<td>float</td>
+<td></td>
+<td>direction of wind in radians relative to the ship</td>
+</tr>
+<tr class="even">
+<td>vessel_heading</td>
+<td>float</td>
+<td></td>
+<td>The direction of the ship through the water</td>
+</tr>
+<tr class="odd">
+<td>constrain_to_positive</td>
+<td>bool</td>
+<td>True</td>
+<td>Should the function return a value between 0 and 2 pi</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>the true wind directionangle relative to north in radians.</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Considering a ship where the relative wind direction is 0, the relative windspeed is 2, and the ships heading is <span class="math inline">\(45^\circ\)</span> or <span class="math inline">\(\frac{\pi}{2}\)</span>, then the true wind speed is</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>true_wind_direction_from_relative(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>5.141592653589793</code></pre>
+</div>
+</div>
+<p>Although by default the wind direction is constrained to return only positive values between <span class="math inline">\(0\)</span> and <span class="math inline">\(2\pi\)</span>, values between <span class="math inline">\(-\frac{\pi}{2}\)</span> and <span class="math inline">\(\frac{\pi}{2}\)</span>, can be created using <code>constrain_to_positive = False</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>true_wind_direction_from_relative(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="dv">2</span>, <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>-1.1415926535897933</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#### bug alert!</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#does this make sense?</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#should it be 180 or zero?</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>true_wind_direction_from_relative(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>3.141592653589793</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="relative-wind" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="relative-wind"><span class="header-section-number">2</span> Relative Wind</h2>
+<section id="direction-1" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="direction-1"><span class="header-section-number">2.1</span> Direction</h3>
+<p>Calculating relative wind speed from true wind speed and direction</p>
+<p><strong>ITTC equations</strong>: E-7, E-10</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L45" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="relative_wind_speed_from_true" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="relative_wind_speed_from_true"><span class="header-section-number">2.2</span> relative_wind_speed_from_true</h3>
+<blockquote class="blockquote">
+<pre><code> relative_wind_speed_from_true (true_wind_speed:float, sog:float,
+                                true_wind_direction:float,
+                                vessel_heading:float)</code></pre>
+</blockquote>
+<p>converts true windspeed to relative</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>true_wind_speed</td>
+<td>float</td>
+<td>The windspeed over ground</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td>Speed over ground of the vessel</td>
+</tr>
+<tr class="odd">
+<td>true_wind_direction</td>
+<td>float</td>
+<td>Direction of wind relative to north</td>
+</tr>
+<tr class="even">
+<td>vessel_heading</td>
+<td>float</td>
+<td>Direction of vessel in water relative to north</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>returns relative windspeed using the same units entered</strong></td>
+</tr>
+</tbody>
+</table>
+<p>As an example consider a ship travelling at 20 knots with a direction due north. The wind blows due north with a speed of 22 knots</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>relative_wind_speed_from_true(<span class="dv">22</span>,<span class="dv">20</span>, <span class="dv">0</span>,<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>42.0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>relative_wind_speed_from_true(<span class="dv">22</span>,<span class="dv">20</span>, <span class="dv">0</span>, np.pi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>2.0</code></pre>
+</div>
+</div>
+</section>
+<section id="direction-2" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="direction-2"><span class="header-section-number">2.3</span> Direction</h3>
+<p>Caclulating relative windspeed from true windspeed and direction</p>
+<p><strong>ITTC equations</strong>: E-6, E-9</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L57" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="relative_wind_direction_from_true" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="relative_wind_direction_from_true"><span class="header-section-number">2.4</span> relative_wind_direction_from_true</h3>
+<blockquote class="blockquote">
+<pre><code> relative_wind_direction_from_true (true_wind_speed:float, sog:float,
+                                    true_wind_direction:float,
+                                    vessel_heading:float,
+                                    constrain_to_positive:bool=False)</code></pre>
+</blockquote>
+<p>converts true direction speed to relative</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>true_wind_speed</td>
+<td>float</td>
+<td></td>
+<td>The windspeed over ground</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td></td>
+<td>Speed over ground of the vessel</td>
+</tr>
+<tr class="odd">
+<td>true_wind_direction</td>
+<td>float</td>
+<td></td>
+<td>Direction of wind relative to north</td>
+</tr>
+<tr class="even">
+<td>vessel_heading</td>
+<td>float</td>
+<td></td>
+<td>Direction of vessel in water relative to north</td>
+</tr>
+<tr class="odd">
+<td>constrain_to_positive</td>
+<td>bool</td>
+<td>False</td>
+<td>Should the function return a value between 0 and 2 pi</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>relative wind direction</strong></td>
+</tr>
+</tbody>
+</table>
+<p>We can see that if a ship is heading due north and the true windspeed is also due north. When the ship is at 20 knots and the wind is at 22 knots, the relative direction of the wind is the same.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>relative_wind_direction_from_true(<span class="dv">22</span>,<span class="dv">20</span>, <span class="dv">0</span>,<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>3.141592653589793</code></pre>
+</div>
+</div>
+<p>However, if the ships speed is faster than the windspeed the direction of the relative wind is reversed even though the magnitude of the relative wind speed stays the same</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>relative_wind_direction_from_true(<span class="dv">20</span>,<span class="dv">22</span>, <span class="dv">0</span>,<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.0</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="correcting-for-the-height-of-the-anemometer" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="correcting-for-the-height-of-the-anemometer"><span class="header-section-number">3</span> Correcting for the height of the Anemometer</h2>
+<p>Adjusts the windspeed taking into account the height of the anemometer on the ship relative to the reference height for windspeed</p>
+<p><strong>ITTC equations</strong>: E-8</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L70" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="vertical_position_anemometer" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="vertical_position_anemometer"><span class="header-section-number">3.1</span> vertical_position_anemometer</h3>
+<blockquote class="blockquote">
+<pre><code> vertical_position_anemometer (true_wind_speed:float,
+                               reference_height:float,
+                               measured_height:float)</code></pre>
+</blockquote>
+<p>Adjusts the windspeed taking into account the height of the anemometer on the ship relative to the reference height for windspeed</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>true_wind_speed</td>
+<td>float</td>
+<td>True windspeed [m/s]</td>
+</tr>
+<tr class="even">
+<td>reference_height</td>
+<td>float</td>
+<td>reference heigh [m]</td>
+</tr>
+<tr class="odd">
+<td>measured_height</td>
+<td>float</td>
+<td>measured height [m]</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>The true windspeed corrected for measurement height</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The adjusted wind speed differences are often small but the corrections can still influence the final result</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>vertical_position_anemometer(<span class="dv">22</span>,<span class="dv">5</span>, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>20.36924367032039</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

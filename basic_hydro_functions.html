@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>pyseatrials - Basic hydro functions</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="pyseatrials - Basic hydro functions">
+<meta property="og:description" content="The dynamic viscosity of seawater can be found using the equations of Sharkawy et al 2010. This equation is used in the TEOS-10 standard and is implemented here.">
+<meta property="og:site-name" content="pyseatrials">
+<meta name="twitter:title" content="pyseatrials - Basic hydro functions">
+<meta name="twitter:description" content="The dynamic viscosity of seawater can be found using the equations of Sharkawy et al 2010. This equation is used in the TEOS-10 standard and is implemented here.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pyseatrials</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Basic hydro functions</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">pyseatrials</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general_functions.html" class="sidebar-item-text sidebar-link">General Functions</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind.html" class="sidebar-item-text sidebar-link">Evaluation of wind data</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wave_resistance.html" class="sidebar-item-text sidebar-link">Wave Resistance</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./power.html" class="sidebar-item-text sidebar-link">Direct Power Analysis</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind_resistance_coef.html" class="sidebar-item-text sidebar-link">Wind resistance coefficients</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./full_example.html" class="sidebar-item-text sidebar-link">Which ship is best?</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic_hydro_functions.html" class="sidebar-item-text sidebar-link active">Basic hydro functions</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./trig.html" class="sidebar-item-text sidebar-link">Useful trigonometry</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#dynamic-viscosity" id="toc-dynamic-viscosity" class="nav-link active" data-scroll-target="#dynamic-viscosity"><span class="toc-section-number">1</span>  Dynamic viscosity</a>
+  <ul class="collapse">
+  <li><a href="#dynamic_viscosity" id="toc-dynamic_viscosity" class="nav-link" data-scroll-target="#dynamic_viscosity"><span class="toc-section-number">1.1</span>  dynamic_viscosity</a></li>
+  <li><a href="#kinematic-viscosity" id="toc-kinematic-viscosity" class="nav-link" data-scroll-target="#kinematic-viscosity"><span class="toc-section-number">1.2</span>  Kinematic viscosity</a></li>
+  <li><a href="#kinematic_visocity_fn" id="toc-kinematic_visocity_fn" class="nav-link" data-scroll-target="#kinematic_visocity_fn"><span class="toc-section-number">1.3</span>  kinematic_visocity_fn</a></li>
+  </ul></li>
+  <li><a href="#reynolds-number" id="toc-reynolds-number" class="nav-link" data-scroll-target="#reynolds-number"><span class="toc-section-number">2</span>  Reynolds number</a>
+  <ul class="collapse">
+  <li><a href="#reynolds_number_fn" id="toc-reynolds_number_fn" class="nav-link" data-scroll-target="#reynolds_number_fn"><span class="toc-section-number">2.1</span>  reynolds_number_fn</a></li>
+  </ul></li>
+  <li><a href="#froude-number" id="toc-froude-number" class="nav-link" data-scroll-target="#froude-number"><span class="toc-section-number">3</span>  Froude Number</a>
+  <ul class="collapse">
+  <li><a href="#froude_number_fn" id="toc-froude_number_fn" class="nav-link" data-scroll-target="#froude_number_fn"><span class="toc-section-number">3.1</span>  froude_number_fn</a></li>
+  </ul></li>
+  <li><a href="#frictional-resistance-coefficent" id="toc-frictional-resistance-coefficent" class="nav-link" data-scroll-target="#frictional-resistance-coefficent"><span class="toc-section-number">4</span>  Frictional resistance coefficent</a>
+  <ul class="collapse">
+  <li><a href="#cf_fn" id="toc-cf_fn" class="nav-link" data-scroll-target="#cf_fn"><span class="toc-section-number">4.1</span>  CF_fn</a></li>
+  </ul></li>
+  <li><a href="#roughness-allowence" id="toc-roughness-allowence" class="nav-link" data-scroll-target="#roughness-allowence"><span class="toc-section-number">5</span>  Roughness allowence</a>
+  <ul class="collapse">
+  <li><a href="#roughness_allowence_fn" id="toc-roughness_allowence_fn" class="nav-link" data-scroll-target="#roughness_allowence_fn"><span class="toc-section-number">5.1</span>  roughness_allowence_fn</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Basic hydro functions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="dynamic-viscosity" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="dynamic-viscosity"><span class="header-section-number">1</span> Dynamic viscosity</h2>
+<p>The dynamic viscosity of seawater can be found using the equations of <a href="https://doi.org/10.5004/dwt.2010.1079">Sharkawy et al 2010</a>. This equation is used in the TEOS-10 standard and is implemented here.</p>
+<p><span class="math display">\[\mu_{SW} = \mu_W (1 + AS +BS^2)\]</span></p>
+<p><span class="math display">\[\mu_W = 4.2844e^{-5} + \frac{1}{0.157(T + 64.993)^2 - 91.296} \]</span></p>
+<p><span class="math display">\[A = 1.541 + 1.998e^{-2} T - 9.52e^{-5}T^2 \]</span> <span class="math display">\[B = 7.974 - 7.561e^{-2}T + 4.724e^{-4}T^2 \]</span></p>
+<p>For the above equations, <span class="math inline">\(T\)</span> is temperature in degrees Celsius, and <span class="math inline">\(S\)</span> is the salinity in <span class="math inline">\(\frac{g}{kg}\)</span>. The Sharkawy correlation is valid for the following conditions</p>
+<ul>
+<li><span class="math inline">\(0 \leq S \leq 150\)</span></li>
+<li><span class="math inline">\(0 \leq T \leq 180\)</span></li>
+</ul>
+<p>This method has an average accuracy of $$4%. For alternative methods on calcualting the dynamic viscosity of seawater see <a href="https://doi.org/10.1007/s13369-020-05020-5">Qasem et al 2021</a>.</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/basic.py#L13" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="dynamic_viscosity" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="dynamic_viscosity"><span class="header-section-number">1.1</span> dynamic_viscosity</h3>
+<blockquote class="blockquote">
+<pre><code> dynamic_viscosity (salinity:float, temperature:float)</code></pre>
+</blockquote>
+<p>Calculate the dynamic viscosity dependent on temperature and salinity</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>salinity</td>
+<td>float</td>
+<td>A positive value of the water salinity [g/kg]</td>
+</tr>
+<tr class="even">
+<td>temperature</td>
+<td>float</td>
+<td>The temperature in celsius [C]</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>returns values in [kg/ms]</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Applying the function to a range of temperatures shows that the viscosity is quite temperature dependent</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dynamic_viscosity(<span class="fl">38e-3</span>, np.linspace(<span class="dv">10</span>, <span class="dv">35</span>, <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([0.00140539, 0.00118849, 0.00102094, 0.0008885 , 0.0007818 ])</code></pre>
+</div>
+</div>
+<p>Looking at a range of both temperature and salinity combinations, the viscosity appears to be more dependent on temperature than salinity in the range of possible values we find in the sea</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>np.linspace(<span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35., 36., 37.,
+       38., 39., 40.])</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>comb_array <span class="op">=</span> np.array(np.meshgrid(np.linspace(<span class="dv">25</span>, <span class="dv">40</span>, counts )<span class="op">*</span><span class="dv">10</span><span class="op">**</span>(<span class="op">-</span><span class="dv">3</span>), np.linspace(<span class="dv">10</span>, <span class="dv">35</span>, counts))).T.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>comb_array</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> dynamic_viscosity(comb_array[:,<span class="dv">0</span>], comb_array[:,<span class="dv">1</span>]).reshape(counts,counts)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.imshow(res, cmap <span class="op">=</span> <span class="st">'hot'</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Dynamic viscosity"</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Salinity'</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>plt.xticks(np.linspace(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">10</span> ) ,np.linspace(<span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">10</span>).astype(<span class="bu">int</span>), rotation<span class="op">=</span>  <span class="dv">45</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>plt.xticks(np.linspace(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">10</span> ) ,np.linspace(<span class="dv">10</span>, <span class="dv">35</span>, <span class="dv">10</span>).astype(<span class="bu">int</span>), rotation<span class="op">=</span>  <span class="dv">45</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'temperature'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Text(0.5, 0, 'temperature')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="98_basic_hydro_functions_files/figure-html/cell-6-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="kinematic-viscosity" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="kinematic-viscosity"><span class="header-section-number">1.2</span> Kinematic viscosity</h3>
+<p><span class="math display">\[v = \frac{\mu_{SW}}{\rho},\]</span> where <span class="math inline">\(\mu_{SW}\)</span> is the dynamic viscosity the seawater, and <span class="math inline">\(\rho\)</span> is the density of the water</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/basic.py#L27" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="kinematic_visocity_fn" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="kinematic_visocity_fn"><span class="header-section-number">1.3</span> kinematic_visocity_fn</h3>
+<blockquote class="blockquote">
+<pre><code> kinematic_visocity_fn (dynamic_viscosity:float=0.00118,
+                        water_density:float=1026)</code></pre>
+</blockquote>
+<p>A simple wrapper calculating the ratio of dynamic viscosity and water density</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dynamic_viscosity</td>
+<td>float</td>
+<td>0.00118</td>
+<td>This value is typically 1.18e-3 [kg/(ms)]</td>
+</tr>
+<tr class="even">
+<td>water_density</td>
+<td>float</td>
+<td>1026</td>
+<td>The density of water under current conditions [kg/m^3]</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>[m^2/s]</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The kinematic viscosity can be calculated without entering any parameters, this uses the default values only</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>kinematic_visocity_fn()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>1.1500974658869397e-06</code></pre>
+</div>
+</div>
+<p>However if the water conditions are not those of the default these alternative values can be entered as required</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dynamic_visc <span class="op">=</span> <span class="fl">1.18e-3</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>water_density  <span class="op">=</span> <span class="dv">1050</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>kinematic_visocity_fn(dynamic_visc, water_density)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>1.1238095238095239e-06</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="reynolds-number" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="reynolds-number"><span class="header-section-number">2</span> Reynolds number</h2>
+<p>The reynolds number is a common formalua used throughout physiscs and engineering desciplines. Low reynolds numbers typically indicate laminar flow whilst high reynolds numbers typically indicate turbulent flow. However, in the case of ships the Reynolds number will always be large, however it is still a valuable component of many other calculations used by marine architects.</p>
+<p><span class="math display">\[\text{Re} = \frac{V_s L_{os}}{v}, \]</span> where <span class="math inline">\(V_s\)</span> is the speed through wataer, <span class="math inline">\(L_{os}\)</span> is the length overall submerged of the ship, and <span class="math inline">\(v\)</span> is the kinematic viscosity.</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/basic.py#L37" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="reynolds_number_fn" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="reynolds_number_fn"><span class="header-section-number">2.1</span> reynolds_number_fn</h3>
+<blockquote class="blockquote">
+<pre><code> reynolds_number_fn (stw:float, length:float, kinematic_viscosity:float)</code></pre>
+</blockquote>
+<p>The Reynolds number is a element of fluid dynamics and is often used to predict whether flow is laminar or turbulent</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>stw</td>
+<td>float</td>
+<td>Speed through water [m/s]</td>
+</tr>
+<tr class="even">
+<td>length</td>
+<td>float</td>
+<td>Length of the vessel, <span class="math inline">\(L_{os}\)</span> Length overall submerged is typically used [m]</td>
+</tr>
+<tr class="odd">
+<td>kinematic_viscosity</td>
+<td>float</td>
+<td>[m^2/s]</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>Reynolds number is dimensionless</strong></td>
+</tr>
+</tbody>
+</table>
+<p>As can be seen due to the small values of kinematic viscosity even a small ship going relatively slowly (approx 10kn) has a large reynolds number</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>reynolds_number_fn(<span class="dv">5</span>, <span class="dv">50</span>, <span class="fl">1.13e-6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>221238938.05309734</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="froude-number" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="froude-number"><span class="header-section-number">3</span> Froude Number</h2>
+<p>The ratio of flow inertia to an external field. The Froude number is often used in estimating the resistance of a partially submerged object in water</p>
+<p><span class="math display">\[\text{Fr} = \frac{V_s}{\sqrt(g L_{WL})}, \]</span> where <span class="math inline">\(V_S\)</span> is the speed through water, <span class="math inline">\(L_{WL}\)</span> is the length at waterline, and <span class="math inline">\(g\)</span> is acceleration due to gravity.</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/basic.py#L49" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="froude_number_fn" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="froude_number_fn"><span class="header-section-number">3.1</span> froude_number_fn</h3>
+<blockquote class="blockquote">
+<pre><code> froude_number_fn (stw:float, length:float, gravity:float=9.81)</code></pre>
+</blockquote>
+<p>The Froude number is useful for calculating the water resistance</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>stw</td>
+<td>float</td>
+<td></td>
+<td>speed through water [m/s]</td>
+</tr>
+<tr class="even">
+<td>length</td>
+<td>float</td>
+<td></td>
+<td>Length of vessel, typically <span class="math inline">\(L_{wl}\)</span> Length of waterline [m]</td>
+</tr>
+<tr class="odd">
+<td>gravity</td>
+<td>float</td>
+<td>9.81</td>
+<td>acceleration due to gravity [m/s^2]</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>The Froude number is a dimensionless value</strong></td>
+</tr>
+</tbody>
+</table>
+<p>As the Froude number is inversevly proportional to the size of the vessel, froude numbers tend to be small for ships which also tend to go at slower speeds. Relative to the Reynolds number the Froude number is always much smaller.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>froude_number_fn(<span class="dv">10</span>, <span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.4515236409857309</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="frictional-resistance-coefficent" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="frictional-resistance-coefficent"><span class="header-section-number">4</span> Frictional resistance coefficent</h2>
+<p>The resistance coefficient related to the resistance of the water flowing over the hull</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/basic.py#L59" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="cf_fn" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="cf_fn"><span class="header-section-number">4.1</span> CF_fn</h3>
+<blockquote class="blockquote">
+<pre><code> CF_fn (reynolds_number:float, adjustment_value:float=0.1194)</code></pre>
+</blockquote>
+<p>An essential part of calculating the resistance experienced by the ship</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>reynolds_number</td>
+<td>float</td>
+<td></td>
+<td>indicating the type of flow of the water</td>
+</tr>
+<tr class="even">
+<td>adjustment_value</td>
+<td>float</td>
+<td>0.1194</td>
+<td>An adjustment value applied by testing company. Default if from ITTC 57</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>This is a dimensionaless value</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>CF_fn(<span class="fl">1e6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.0046874875</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="roughness-allowence" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="roughness-allowence"><span class="header-section-number">5</span> Roughness allowence</h2>
+<p>The 19<span class="math inline">\(^{th}\)</span> ITTC proposed a formula that corrects for the roughness of the vessel hull.</p>
+<p><span class="math display">\[\Delta C_F = \frac{11}{250} \left(  \left(\frac{k_s}{L_{WL}}\right)^{\frac{1}{3}} -10 \cdot \text{Re}^{-\frac{1}{3}} + \frac{1}{8000} \right), \]</span> wehere <span class="math inline">\(k_s\)</span> is the surface roughness, <span class="math inline">\(L_{WL}\)</span> is the length of vessel at waterline, and <span class="math inline">\(Re\)</span> is the Reynolds number for current conditions.</p>
+<p>This value is used in several other adjustments and calculations. Function for obtaining it is found here.</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/basic.py#L69" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="roughness_allowence_fn" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="roughness_allowence_fn"><span class="header-section-number">5.1</span> roughness_allowence_fn</h3>
+<blockquote class="blockquote">
+<pre><code> roughness_allowence_fn (length:float, reynolds_number:float,
+                         surface_roughness:float=0.00015)</code></pre>
+</blockquote>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>length</td>
+<td>float</td>
+<td></td>
+<td>Length of the vessel at waterline [m]</td>
+</tr>
+<tr class="even">
+<td>reynolds_number</td>
+<td>float</td>
+<td></td>
+<td>dimensionless value describing flow properties</td>
+</tr>
+<tr class="odd">
+<td>surface_roughness</td>
+<td>float</td>
+<td>0.00015</td>
+<td>The default value is outdated an modern hull covering are likely considerably less rough [m]</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>roughness_allowence_fn(<span class="dv">189</span>, <span class="fl">2.63e9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.00021361371568178405</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
