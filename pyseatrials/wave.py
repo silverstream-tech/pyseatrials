@@ -19,5 +19,5 @@ def stawave1_fn(
     "STAWAVE-1 finds the resistance caused by bow waves for ships experiencing low heave and pitch"
     
     
-    return (1/16)* water_density * wave_height**2 * beam * np.sqrt(beam/length)
+    return (1/16)* water_density * gravity * wave_height**2 * beam * np.sqrt(beam/length)
     
