@@ -234,10 +234,10 @@ def calculate_all_values_from_trial_phase(
     K_Q,
     J,
     water_density:float = 1026
-    ): #returns a dictionaryt of the ouput variables from the trial condition calculations
+    ): #returns a dictionary of the ouput variables from the trial condition calculations
     
     "Perform all the calculations to get the 'trials conditions' values"
-    #These return the initia; value of eta/t/w, the function is used just to show, although it does nothing. This can be swapped out
+    #These return the initial value of eta/t/w, the function is used just to show, although it does nothing. This can be swapped out
     eta_Rms = eta_ms
     t_ms = t_Rid
     w_Mms = w_Mid
@@ -294,7 +294,6 @@ def calculate_all_values_from_ideal_phase(
         V_s:float,
         P_dms:float,
         delta_R:float,
-        shaft_speed:float,
         diameter:float,
         number_shafts:float,
         t_Rid:float,
@@ -380,7 +379,6 @@ def delivered_power_ideal_condition(
                 V_s = V_s,
                 P_dms = P_dms,
                 delta_R = delta_R ,
-                shaft_speed = shaft_speed ,
                 diameter = diameter, 
                 number_shafts = number_shafts,
                 t_Rid = t_Rid ,
