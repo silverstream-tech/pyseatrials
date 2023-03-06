@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from fastcore.test import *
 
-
 # %% ../nbs/98_basic_hydro_functions.ipynb 5
 def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g/kg]
                       temperature:float #The temperature in celsius [C]
