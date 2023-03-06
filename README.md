@@ -34,6 +34,12 @@ numpy.
 python -m pip install git+https://github.com/silverstream-tech/pyseatrials 
 ```
 
+To force an upgrade of the library
+
+``` sh
+pip install --upgrade --no-deps --force-reinstall git+https://github.com/silverstream-tech/pyseatrials 
+```
+
 # How to use
 
 As an example consider the problem of calculating resistance experienced
@@ -78,7 +84,7 @@ stawave1_fn(20, np.linspace(1, 3, 4), 5)
 
 All functions are have documentation, in addition there is in depth
 documentation online
-([STAWAVE-1](https://jonnob.github.io/pyseatrials/wave_resistance.html#stawave1_fn)).
+([STAWAVE-1](https://silverstream-tech.github.io/pyseatrials/wave_resistance.html#stawave1_fn)).
 
 ``` python
 stawave1_fn?

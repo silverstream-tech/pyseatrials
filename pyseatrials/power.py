@@ -250,7 +250,6 @@ def calculate_all_values_from_trial_phase(
     K_T_coeffs = get_curve_coefficient(K_T, J)
     K_Q_coeffs = get_curve_coefficient(K_Q, J)
 
-    #not vectorised
     J_ms = propeller_advance_coefficient(K_Qms, K_Q_coeffs[0], K_Q_coeffs[1], K_Q_coeffs[2], "torque"  )
 
 

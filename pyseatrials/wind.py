@@ -59,7 +59,7 @@ def true2rel_dir(
                             sog:float, #Speed over ground of the vessel
                             true_wind_direction:float, #Direction of wind relative to north
                             vessel_heading:float, #Direction of vessel in water relative to north
-                            constrain_to_positive:bool = False #Should the function return a value between 0 and 2 pi
+                            constrain_to_positive:bool = True #Should the function return a value between 0 and 2 pi
 )-> float: #relative wind direction
     
     "converts true direction speed to relative"
