@@ -58,7 +58,7 @@ STAWAVE-1 function
 stawave1_fn(beam = 20, wave_height =  3, length = 5)
 ```
 
-    23085.0
+    226463.85000000003
 
 STAWAVE-1 like almost all functions in `pyseatrials` are vectorised.
 This means if an array of values is used the function will return an
@@ -69,7 +69,7 @@ Newtons for a range of wave heights.
 stawave1_fn(20, np.linspace(1, 3, 4), 5)
 ```
 
-    array([ 2565.,  7125., 13965., 23085.])
+    array([ 25162.65,  69896.25, 136996.65, 226463.85])
 
 <div>
 
@@ -87,20 +87,13 @@ documentation online
 ([STAWAVE-1](https://silverstream-tech.github.io/pyseatrials/wave_resistance.html#stawave1_fn)).
 
 ``` python
-stawave1_fn?
+help(stawave1_fn)
 ```
 
-    Signature:
-    stawave1_fn(
-        beam: float,
-        wave_height: float,
-        length: float,
-        water_density: float = 1026,
-        gravity: float = 9.81,
-    ) -> float
-    Docstring: STAWAVE-1 finds the resistance caused by bow waves for ships experiencing low heave and pitch
-    File:      /usr/local/lib/python3.9/dist-packages/pyseatrials/wave.py
-    Type:      function
+    Help on function stawave1_fn in module pyseatrials.wave:
+
+    stawave1_fn(beam: float, wave_height: float, length: float, water_density: float = 1026, gravity: float = 9.81) -> float
+        STAWAVE-1 finds the resistance caused by bow waves for ships experiencing low heave and pitch
 
 # Notes
 
