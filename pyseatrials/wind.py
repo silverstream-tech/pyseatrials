@@ -64,7 +64,9 @@ def true2rel_dir(
     
     "converts true direction speed to relative"
     
-    return find_gamma_fn(true_wind_speed, sog, true_wind_direction - vessel_heading)
+    gamma  = find_gamma_fn(true_wind_speed, sog, true_wind_direction - vessel_heading)
+
+    return gamma + 2*np.pi*(gamma<0)*constrain_to_positive
 
 # %% ../nbs/02_wind.ipynb 39
 def double_run_average(a, b, alpha, beta):
