@@ -7,7 +7,7 @@ __all__ = ['estimate_speed_through_water']
 import numpy as np
 from scipy.optimize import curve_fit
 
-# %% ../nbs/current.ipynb 6
+# %% ../nbs/current.ipynb 7
 def estimate_speed_through_water(P_id, V_g, t, T_c, tolerance=1e-6, max_iter=1000):
 
     def current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c):

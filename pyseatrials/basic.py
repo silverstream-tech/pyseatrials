@@ -4,12 +4,12 @@
 __all__ = ['dynamic_viscosity', 'kinematic_viscosity_fn', 'reynolds_number_fn', 'froude_number_fn', 'CF_fn',
            'roughness_allowence_fn']
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 3
+# %% ../nbs/98_basic_hydro_functions.ipynb 4
 import numpy as np
 import pandas as pd
 from fastcore.test import *
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 5
+# %% ../nbs/98_basic_hydro_functions.ipynb 6
 def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g/kg]
                       temperature:float #The temperature in celsius [C]
                      )->float: #returns values in [kg/ms]
@@ -23,7 +23,7 @@ def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g
     
     return mu_w * (1 + A*salinity + B*salinity**2)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 14
+# %% ../nbs/98_basic_hydro_functions.ipynb 15
 def kinematic_viscosity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typically 1.18e-3 [kg/(ms)]
                           water_density:float = 1026 #The density of water under current conditions [kg/m^3]
                          )-> float: #[m^2/s]
@@ -33,7 +33,7 @@ def kinematic_viscosity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typ
     return dynamic_viscosity/water_density
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 21
+# %% ../nbs/98_basic_hydro_functions.ipynb 22
 def reynolds_number_fn(stw:float, #Speed through water [m/s]
                       length:float, #Length of the vessel, $L_{os}$ Length overall submerged is typically used [m]
                       kinematic_viscosity:float # [m^2/s]
@@ -45,7 +45,7 @@ def reynolds_number_fn(stw:float, #Speed through water [m/s]
     
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 26
+# %% ../nbs/98_basic_hydro_functions.ipynb 27
 def froude_number_fn(stw:float, #speed through water [m/s]
                     length:float,#Length of vessel, typically $L_{wl}$ Length of waterline [m]
                     gravity:float = 9.81 #acceleration due to gravity [m/s^2]
@@ -55,7 +55,7 @@ def froude_number_fn(stw:float, #speed through water [m/s]
     
     return stw/np.sqrt(gravity * length)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 31
+# %% ../nbs/98_basic_hydro_functions.ipynb 32
 def CF_fn(reynolds_number:float, #indicating the type of flow of the water
        adjustment_value:float = 0.1194 # An adjustment value applied by testing company. Default if from ITTC 57
       )-> float: #This is a dimensionaless value
@@ -65,7 +65,7 @@ def CF_fn(reynolds_number:float, #indicating the type of flow of the water
     return (1 + adjustment_value) * 0.067 / (np.log10(reynolds_number) -2) ** 2   
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 35
+# %% ../nbs/98_basic_hydro_functions.ipynb 36
 def roughness_allowence_fn(
                           length:float, #Length of the vessel at waterline [m]
                           reynolds_number:float, # dimensionless value describing flow properties

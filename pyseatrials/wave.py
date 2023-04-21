@@ -3,13 +3,13 @@
 # %% auto 0
 __all__ = ['stawave1_fn', 'modified_pierson_moskowitz_spectrum', 'calculate_R_wave', 'R_AWL']
 
-# %% ../nbs/03_wave_resistance.ipynb 2
+# %% ../nbs/03_wave_resistance.ipynb 3
 import numpy as np
 from scipy.integrate import quad
 from scipy.special import iv, kn
 from fastcore.test import *
 
-# %% ../nbs/03_wave_resistance.ipynb 4
+# %% ../nbs/03_wave_resistance.ipynb 5
 def stawave1_fn(
     beam:float, #the beam of the ship [m]
     wave_height:float, #Significant wave height of wind waves [m]
@@ -24,7 +24,7 @@ def stawave1_fn(
     return (1/16)* water_density * gravity * wave_height**2 * beam * np.sqrt(beam/length)
     
 
-# %% ../nbs/03_wave_resistance.ipynb 8
+# %% ../nbs/03_wave_resistance.ipynb 9
 def modified_pierson_moskowitz_spectrum(omega:float, #The circular frequency [rads/s]
                                         H_W1_3:float, #Significant wave height of Wind and Swell waves [m]
                                         #T_01:float#
@@ -36,7 +36,7 @@ def modified_pierson_moskowitz_spectrum(omega:float, #The circular frequency [ra
     S_eta = (A_fw / (omega ** 5)) * np.exp(-B_fw / (omega ** 4))
     return S_eta
 
-# %% ../nbs/03_wave_resistance.ipynb 12
+# %% ../nbs/03_wave_resistance.ipynb 13
 def _a_1(C_B):
     return 60.3 * C_B**1.34
 
@@ -72,7 +72,7 @@ def _alpha_1(I_1, K_1, f1):
 def _R_AWRL(rho_s, g, zeta_A, B, alpha_1):
     return 0.5 * rho_s * g * zeta_A**2 * B * alpha_1
 
-# %% ../nbs/03_wave_resistance.ipynb 13
+# %% ../nbs/03_wave_resistance.ipynb 14
 def calculate_R_wave(omega:float, # circular wave frequency [rads/s]
                      C_B:float, # block coefficient [dimensionless]
                      L_pp:float, # Length between perpendiculars [m]

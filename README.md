@@ -40,6 +40,22 @@ To force an upgrade of the library
 pip install --upgrade --no-deps --force-reinstall git+https://github.com/silverstream-tech/pyseatrials 
 ```
 
+# Modules
+
+The `pyseatrials` library is broken into different modules which relate
+to different aspects of understanding a ships performance at sea. The
+names of the modules are listed below as hyperlinks to the documentation
+pages.
+
+- [general](./general_functions/)
+- [wind](./wind/)
+- [wind_res](./wind_resistance/)
+- [wave](./wave_resistance/)
+- [current](./current/)
+- [power](./power/)
+- [basic](./basic_hydro_functions/)
+- [trig](./trig/)
+
 # How to use
 
 As an example consider the problem of calculating resistance experienced

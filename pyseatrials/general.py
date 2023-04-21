@@ -3,14 +3,14 @@
 # %% auto 0
 __all__ = ['knots_to_ms', 'ms_to_knots', 'wind_resistance', 'temp_salinity_water_resistance', 'load_datasets']
 
-# %% ../nbs/01_general_functions.ipynb 3
+# %% ../nbs/01_general_functions.ipynb 4
 import numpy as np
 import pandas as pd
 from fastcore.test import *
 import pkgutil
 from io import BytesIO
 
-# %% ../nbs/01_general_functions.ipynb 5
+# %% ../nbs/01_general_functions.ipynb 6
 def knots_to_ms(knots:float #the speed in knots
                ) -> float: #speed in m/s
     
@@ -18,7 +18,7 @@ def knots_to_ms(knots:float #the speed in knots
     
     return knots/1.943844
 
-# %% ../nbs/01_general_functions.ipynb 6
+# %% ../nbs/01_general_functions.ipynb 7
 def ms_to_knots(ms:float #the speed in m/s
                ) -> float: #speed in knots
     
@@ -26,7 +26,7 @@ def ms_to_knots(ms:float #the speed in m/s
     
     return ms * 1.943844
 
-# %% ../nbs/01_general_functions.ipynb 11
+# %% ../nbs/01_general_functions.ipynb 12
 def wind_resistance(air_density:float, #Air density [kg/$m^3$]
                    wind_resistance_coef_rel:float, #the coefficient of wind resistance using the relative angle of the wind
                    wind_resistance_coef_zero:float, #the coefficient of wind resistance using angle 0 radians
@@ -41,7 +41,7 @@ def wind_resistance(air_density:float, #Air density [kg/$m^3$]
     
     return wind_resistance_val
 
-# %% ../nbs/01_general_functions.ipynb 16
+# %% ../nbs/01_general_functions.ipynb 17
 def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient for actual water temperature and salinity
                                    CF0:float, #frictional resistance coefficient for reference water temperature and salinity
                                    delta_CF:float, #roughness allowance associated with Reynolds number for actual water temperature and salinity
@@ -65,7 +65,7 @@ def temp_salinity_water_resistance(CF:float, #frictional resistance coefficient 
     return RAS
     
 
-# %% ../nbs/01_general_functions.ipynb 21
+# %% ../nbs/01_general_functions.ipynb 22
 def load_datasets(dataset:str #The name of the dataset to load
                      ): #returns a dataframe containing example data
         

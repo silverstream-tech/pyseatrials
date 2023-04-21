@@ -8,11 +8,11 @@ __all__ = ['correction_delivered_power', 'propulsive_efficiency_corr', 'full_sca
            'calculate_all_values_from_trial_phase', 'calculate_all_values_from_ideal_phase',
            'delivered_power_ideal_condition']
 
-# %% ../nbs/04_power.ipynb 3
+# %% ../nbs/04_power.ipynb 4
 import numpy as np
 from fastcore.test import *
 
-# %% ../nbs/04_power.ipynb 5
+# %% ../nbs/04_power.ipynb 6
 def correction_delivered_power(
     p_dms:float, #delivered power [W]
     resistance_increase:float, #Resistance increase derived from data measured in seatrial
@@ -27,7 +27,7 @@ def correction_delivered_power(
     return resistance_increase * stw /eta_id + p_dms * (1- eta_ms/eta_id)
     
 
-# %% ../nbs/04_power.ipynb 9
+# %% ../nbs/04_power.ipynb 10
 def propulsive_efficiency_corr(n_o:float, #open water efficiency
                           n_r:float, #relative rotative efficiency
                           t:float, #thrust deduction factor
@@ -37,7 +37,7 @@ def propulsive_efficiency_corr(n_o:float, #open water efficiency
     return n_o*n_r*(1-t)/(1-w_s)
     
 
-# %% ../nbs/04_power.ipynb 13
+# %% ../nbs/04_power.ipynb 14
 def full_scale_wake_fraction(wake_fraction_model:float,
                             scale_correlation_factor:float
                             )-> float:
@@ -46,7 +46,7 @@ def full_scale_wake_fraction(wake_fraction_model:float,
     
     return 1- (1- wake_fraction_model) * scale_correlation_factor
 
-# %% ../nbs/04_power.ipynb 18
+# %% ../nbs/04_power.ipynb 19
 def full_scale_wake_speed(flow_speed:float, #The speed of flow through the propeller
                          stw:float, #Ship's speed through water
                          )-> float:
@@ -55,7 +55,7 @@ def full_scale_wake_speed(flow_speed:float, #The speed of flow through the prope
     
     return 1 - (flow_speed/stw)
 
-# %% ../nbs/04_power.ipynb 23
+# %% ../nbs/04_power.ipynb 24
 def scale_correlation_factor(
     trial:float, #The full-scale wake fraction in the trial
     model:float  #The wake fraction of the model derived from tank tests
@@ -63,7 +63,7 @@ def scale_correlation_factor(
     "Calcualte the scale correlation factor using the model fraction from tank tests, and the full-scale fraction from trials"
     return (1  - trial)/(1-model)
 
-# %% ../nbs/04_power.ipynb 28
+# %% ../nbs/04_power.ipynb 29
 def self_propulsion_factors(
     x_ideal:float, #The variable in ideal conditions. It is acceptable to use this value without adjustments
     delta_x:float = 0, #The change per unit of the resistance ratios. Default is 0
@@ -75,7 +75,7 @@ def self_propulsion_factors(
     
     return x_ideal + delta_x * (delta_r/delta_r_ideal)
 
-# %% ../nbs/04_power.ipynb 33
+# %% ../nbs/04_power.ipynb 34
 def get_curve_coefficient(y:float, #An array containing the dependent variable coefficient
                       x:float, #An array containing the propeller advance coefficient
                      )->float: #Returns an array containing model coefficients
@@ -97,7 +97,7 @@ def get_curve_coefficient(y:float, #An array containing the dependent variable c
     return b
     
 
-# %% ../nbs/04_power.ipynb 40
+# %% ../nbs/04_power.ipynb 41
 def quadratic_method(coefs:float, #An array of the coefficients created by the function get_curve_coefficient
                     propeller_advance_coef:float #The propeller advance coefficient
                     )-> float: #The target value for the coefficient types entered
@@ -106,7 +106,7 @@ def quadratic_method(coefs:float, #An array of the coefficients created by the f
     
     return coefs[0] * propeller_advance_coef**2 + coefs[1] * propeller_advance_coef + coefs[2]
 
-# %% ../nbs/04_power.ipynb 45
+# %% ../nbs/04_power.ipynb 46
 def torque_coef(power:float, #The delivered power
                      shaft_speed:float, #measure propeller shaft speed [rev/s]
                      diameter:float, #properller_diameter [m]
@@ -122,7 +122,7 @@ def torque_coef(power:float, #The delivered power
     
     
 
-# %% ../nbs/04_power.ipynb 50
+# %% ../nbs/04_power.ipynb 51
 def load_factor(thrust_coefficient:float, #The thrust coefficient
                propeller_advance:float #The propeller advance coefficient
                )->float: # dimensionless load factor
@@ -131,7 +131,7 @@ def load_factor(thrust_coefficient:float, #The thrust coefficient
     
     return thrust_coefficient/propeller_advance**2
 
-# %% ../nbs/04_power.ipynb 55
+# %% ../nbs/04_power.ipynb 56
 def load_factor_resistance(
                     resistance:float, # The total resistance experienced by the vessel
                     thrust_deduction:float, #The thrust deduction factor
@@ -145,7 +145,7 @@ def load_factor_resistance(
     
     return resistance /( (1 - thrust_deduction) * (1- wake_fraction)**2 * water_density * stw**2 * diameter **2 )
 
-# %% ../nbs/04_power.ipynb 60
+# %% ../nbs/04_power.ipynb 61
 def propeller_advance_coefficient(propeller_value:float, #The torque coefficient or loading factor as appropriate
                                   a:float, #coefficient 'a' from get_curve_coefficient
                                   b:float, #coefficient 'b' from get_curve_coefficient
@@ -170,7 +170,7 @@ def propeller_advance_coefficient(propeller_value:float, #The torque coefficient
     
     return J
 
-# %% ../nbs/04_power.ipynb 68
+# %% ../nbs/04_power.ipynb 69
 def open_water_efficiency(propeller_advance_coef:float, #The propeller advance coefficient of the ship
                          thrust_coef:float, # thrust coefficient
                          torque_coef:float 
@@ -180,7 +180,7 @@ def open_water_efficiency(propeller_advance_coef:float, #The propeller advance c
     
     return (propeller_advance_coef/(2*np.pi))*(thrust_coef/torque_coef)
 
-# %% ../nbs/04_power.ipynb 73
+# %% ../nbs/04_power.ipynb 74
 def propeller_flow(
     propeller_advance_coef:float, #Propeller advance coefficient [n/a]
     rotations_sec:float, #propeller rotations per second [rev/sec]
@@ -191,7 +191,7 @@ def propeller_flow(
     
     return propeller_advance_coef * rotations_sec * diameter
 
-# %% ../nbs/04_power.ipynb 78
+# %% ../nbs/04_power.ipynb 79
 def total_resistance(
                     load_factor:float, # The load factor
                     thrust_deduction:float, #The thrust deduction factor
@@ -205,7 +205,7 @@ def total_resistance(
     
     return load_factor * (1 - thrust_deduction) * (1- wake_fraction)**2 * water_density * stw**2 * diameter **2
 
-# %% ../nbs/04_power.ipynb 83
+# %% ../nbs/04_power.ipynb 84
 def propeller_speed(
         propeller_advance_coef:float, #Propeller advance coefficient [n/a]
         stw:float, #The speed through water of the vessel [m/s]
@@ -216,7 +216,7 @@ def propeller_speed(
 
     return stw*(1-wake_fraction)/(propeller_advance_coef * diameter)
 
-# %% ../nbs/04_power.ipynb 88
+# %% ../nbs/04_power.ipynb 89
 def calculate_all_values_from_trial_phase(
     V_s:float,
     P_dms:float,
@@ -288,7 +288,7 @@ def calculate_all_values_from_trial_phase(
     return trial_values, [K_T_coeffs, K_Q_coeffs]
     
 
-# %% ../nbs/04_power.ipynb 93
+# %% ../nbs/04_power.ipynb 94
 def calculate_all_values_from_ideal_phase(
         V_s:float,
         P_dms:float,
@@ -328,7 +328,7 @@ def calculate_all_values_from_ideal_phase(
     
     return ideal_values
 
-# %% ../nbs/04_power.ipynb 100
+# %% ../nbs/04_power.ipynb 101
 def delivered_power_ideal_condition(
     V_s:float,
     P_dms:float,
