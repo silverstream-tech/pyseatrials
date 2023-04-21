@@ -10,7 +10,7 @@ from fastcore.test import *
 import pkgutil
 from io import BytesIO
 
-# %% ../nbs/05_wind_resistance_coef.ipynb 4
+# %% ../nbs/05_wind_resistance_coef.ipynb 5
 def load_wind_coefficients(vessel_type:str #The name of the vessel type. Must be one of 9 options
                      ): #returns a data set with where the first column us angle_of_attack in radians, the second is angle_of_attack in degrees, the subsequent columns names ship states
         
@@ -22,7 +22,7 @@ def load_wind_coefficients(vessel_type:str #The name of the vessel type. Must be
         return pd.read_csv(BytesIO(res))
     
 
-# %% ../nbs/05_wind_resistance_coef.ipynb 8
+# %% ../nbs/05_wind_resistance_coef.ipynb 9
 def interpolate_cx(df, #dataframe of the wind resistance dataset
                    relative_wind_direction:float, #The angle of the wind relative to the ship [rads]
                    ship_state:str #The state of the ship the resistance should be evaluated in. Chosen from the columns of the wind resistance datasets
