@@ -2,14 +2,14 @@
 
 # %% auto 0
 __all__ = ['dynamic_viscosity', 'kinematic_viscosity_fn', 'reynolds_number_fn', 'froude_number_fn', 'CF_fn',
-           'roughness_allowence_fn']
+           'roughness_resistance_fn', 'calculate_form_factor', 'calculate_viscous_resistance']
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 4
+# %% ../nbs/98_basic_hydro_functions.ipynb 5
 import numpy as np
 import pandas as pd
 from fastcore.test import *
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 6
+# %% ../nbs/98_basic_hydro_functions.ipynb 7
 def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g/kg]
                       temperature:float #The temperature in celsius [C]
                      )->float: #returns values in [kg/ms]
@@ -23,7 +23,7 @@ def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g
     
     return mu_w * (1 + A*salinity + B*salinity**2)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 15
+# %% ../nbs/98_basic_hydro_functions.ipynb 16
 def kinematic_viscosity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typically 1.18e-3 [kg/(ms)]
                           water_density:float = 1026 #The density of water under current conditions [kg/m^3]
                          )-> float: #[m^2/s]
@@ -33,7 +33,7 @@ def kinematic_viscosity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typ
     return dynamic_viscosity/water_density
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 22
+# %% ../nbs/98_basic_hydro_functions.ipynb 23
 def reynolds_number_fn(stw:float, #Speed through water [m/s]
                       length:float, #Length of the vessel, $L_{os}$ Length overall submerged is typically used [m]
                       kinematic_viscosity:float # [m^2/s]
@@ -45,7 +45,7 @@ def reynolds_number_fn(stw:float, #Speed through water [m/s]
     
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 27
+# %% ../nbs/98_basic_hydro_functions.ipynb 28
 def froude_number_fn(stw:float, #speed through water [m/s]
                     length:float,#Length of vessel, typically $L_{wl}$ Length of waterline [m]
                     gravity:float = 9.81 #acceleration due to gravity [m/s^2]
@@ -55,7 +55,7 @@ def froude_number_fn(stw:float, #speed through water [m/s]
     
     return stw/np.sqrt(gravity * length)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 32
+# %% ../nbs/98_basic_hydro_functions.ipynb 33
 def CF_fn(reynolds_number:float, #indicating the type of flow of the water
        adjustment_value:float = 0.1194 # An adjustment value applied by testing company. Default if from ITTC 57
       )-> float: #This is a dimensionaless value
@@ -65,8 +65,8 @@ def CF_fn(reynolds_number:float, #indicating the type of flow of the water
     return (1 + adjustment_value) * 0.067 / (np.log10(reynolds_number) -2) ** 2   
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 36
-def roughness_allowence_fn(
+# %% ../nbs/98_basic_hydro_functions.ipynb 37
+def roughness_resistance_fn(
                           length:float, #Length of the vessel at waterline [m]
                           reynolds_number:float, # dimensionless value describing flow properties
                           surface_roughness:float = 150e-6, #The default value is outdated an modern hull covering are likely considerably less rough [m]
@@ -75,3 +75,35 @@ def roughness_allowence_fn(
     ratio_value = surface_roughness / length
     return (11/250)* (ratio_value**(1/3) - 10 * reynolds_number**(-1/3)) + (1/8e3)
     
+
+# %% ../nbs/98_basic_hydro_functions.ipynb 41
+def calculate_form_factor(C_B: float, B: float, L_pp: float, T_M: float) -> float:
+    """
+    Calculate the form factor (1+k) using Gross & Watanabe method.
+    
+    Args:
+    C_B (float): Block coefficient
+    B (float): Beam of the ship
+    L_pp (float): Length between perpendiculars
+    T_M (float): Draught at midship
+    
+    Returns:
+    float: Form factor (1+k)
+    """
+    k = 1.017 + 20 * C_B * (B / L_pp)**2 * (T_M / B)**0.5
+    return k
+
+
+# %% ../nbs/98_basic_hydro_functions.ipynb 45
+def calculate_viscous_resistance(C_F: float, form_factor: float, delta_C_F: float) -> float:
+    """Calculates the viscous resistance coefficient for a vessel.
+
+    Args:
+        C_F: The frictional correlation coefficient
+        form_factor: The form factor (1+k)
+        delta_C_F: The roughness resistance coefficient
+
+    Returns:
+        The viscous resistance coefficient.
+    """
+    return 1.06 * C_F * form_factor + delta_C_F * C_F

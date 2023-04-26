@@ -47,14 +47,15 @@ to different aspects of understanding a ships performance at sea. The
 names of the modules are listed below as hyperlinks to the documentation
 pages.
 
-- [general](./general_functions/)
-- [wind](./wind/)
-- [wind_res](./wind_resistance/)
-- [wave](./wave_resistance/)
-- [current](./current/)
-- [power](./power/)
-- [basic](./basic_hydro_functions/)
-- [trig](./trig/)
+- [general](https://silverstream-tech.github.io/pyseatrials/general_functions.html)
+- [wind](https://silverstream-tech.github.io/pyseatrials/wind.html)
+- [wind_res](https://silverstream-tech.github.io/pyseatrials/wind_resistance_coef.html)
+- [wave](https://silverstream-tech.github.io/pyseatrials/wave_resistance.html)
+- [current](https://silverstream-tech.github.io/pyseatrials/current.html)
+- [power](https://silverstream-tech.github.io/pyseatrials/power.html)
+- [shallow](https://silverstream-tech.github.io/pyseatrials/shallow.html)
+- [basic](https://silverstream-tech.github.io/pyseatrials/basic_hydro_functions.html)
+- [trig](https://silverstream-tech.github.io/pyseatrials/trig.html)
 
 # How to use
 
@@ -136,7 +137,6 @@ help(stawave1_fn)
 
 The following parts of ITTC need to be implemented
 
-- STAWAVE-2
 - function that plots ship and wind/current/wave in both polar and
   cartesian relative coordinates
 - Example ship data
