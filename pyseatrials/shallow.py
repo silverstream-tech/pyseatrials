@@ -9,22 +9,6 @@ def shallow_water_correction(Cv_prime: float, rho: float, Vs: float, S: float, T
     """
     Perform Raven corrections for shallow water performance
 
-    Args:
-        Cv_prime (float): The resistance coefficient for a ship's hull.
-        rho (float): The density of seawater.
-        Vs (float): The speed of the ship.
-        S (float): The wetted surface area of the ship's hull.
-        T_M (float): The mean draft of the ship.
-        h (float): The depth of water.
-        L_pp (float): The length of the perpendiculars of the ship.
-        B (float): The breadth of the ship.
-        C_B (float): The block coefficient of the ship.
-        P_D_shallow (float): The power needed to propel the ship through shallow water.
-        eta_Did (float): The propeller efficiency.
-        R_V_deep (float): This arguement allow the recursion to work effectively and can be ignored by the user
-
-    Returns:
-        Tuple[float, float, float]: The equivalent deep water power needed to propel the ship, the sinkage, and the viscous resistance.
     """
     # Calculate viscous friction in deep water if not provided
     if R_V_deep is None:
