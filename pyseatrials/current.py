@@ -56,7 +56,7 @@ def estimate_speed_through_water(P_id, V_g, t, T_c, tolerance=1e-6, max_iter=100
 
 
 
-# %% ../nbs/06_current.ipynb 11
+# %% ../nbs/06_current.ipynb 12
 def current_mean_of_means(list_of_speeds:list, # The mean speed over ground across a double run,
                            start_time:float, # Time in decimal hours when the first run took place,
                            time_between_runs:float #Time in decimal hours between each run. Note the time difference must be consistent between all runs

@@ -77,7 +77,7 @@ def double_run_average(a, b, alpha, beta):
 
 # %% ../nbs/02_wind.ipynb 44
 def vertical_position_anemometer(true_wind_speed:float, #True windspeed [m/s]
-                                 reference_height:float, #reference heigh [m]
+                                 reference_height:float, #reference height [m]
                                  measured_height:float  # measured height [m]
                                 )-> float: #The true windspeed corrected for measurement height
     
