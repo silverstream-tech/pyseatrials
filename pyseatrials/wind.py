@@ -70,10 +70,10 @@ def true2rel_dir(
 
 # %% ../nbs/02_wind.ipynb 40
 def double_run_average(a, b, alpha, beta):
+    #it makes no difference if a/2, b/2 is used or average_velocity/2 the result is the same
+    average_velocity, average_direction = combine_vectors(a, b, alpha, beta)
 
-    average_velocity, average_direction = combine_vectors(a/2, b/2, alpha, beta)
-
-    return average_velocity, average_direction
+    return average_velocity/2, average_direction
 
 # %% ../nbs/02_wind.ipynb 44
 def vertical_position_anemometer(true_wind_speed:float, #True windspeed [m/s]
