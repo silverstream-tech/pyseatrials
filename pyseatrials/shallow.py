@@ -26,7 +26,8 @@ def shallow_water_correction(Cv_prime: float, rho: float, Vs: float, S: float, T
     
     # Calculate additional displacement due to sinkage
     A_W = L_pp * B
-    delta_displacement = sinkage * A_W / displacement if sinkage * A_W / displacement < 0.05 else 0.05
+    #delta displacement is written like this to allow vectorisation
+    delta_displacement = np.minimum(sinkage * A_W / displacement, 0.05)
     
     # Calculate rsink
     rsink = (1 - delta_displacement)**(2/3)

@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['dynamic_viscosity', 'kinematic_viscosity_fn', 'reynolds_number_fn', 'froude_number_fn', 'CF_fn',
-           'roughness_resistance_fn', 'calculate_form_factor', 'calculate_viscous_resistance']
+           'roughness_resistance_fn', 'calculate_form_factor', 'calculate_viscous_resistance', 'wetted_surface_area']
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 5
 import numpy as np
@@ -107,3 +107,20 @@ def calculate_viscous_resistance(C_F: float, form_factor: float, delta_C_F: floa
         The viscous resistance coefficient.
     """
     return 1.06 * C_F * form_factor + delta_C_F * C_F
+
+# %% ../nbs/98_basic_hydro_functions.ipynb 52
+def wetted_surface_area(draft: float, #The draft of the ship [m]
+                        beam: float, # The beam of the ship [m]
+                        length: float, # The length of the ship [m]
+                        midship_section_coeff: float, # The midship section coefficient [none]
+                        block_coeff: float, #The block coefficient [none]
+                        waterplane_area_coeff: float, # The waterplane area coefficient [none]
+                        transverse_sectional_area: float #The transverse sectional area of the bulb [m^2]
+                        )->float:  # The wetted surface area of the ship [m^2]
+    """
+    Calculates the wetted surface area of a ship using the Hotropp-Mennen formula.
+    """
+
+    wetted_surface_area = length * (2 * draft + beam) * np.sqrt(midship_section_coeff) * (0.453 + 0.4425 * block_coeff - 0.2862 * midship_section_coeff - 0.003467 * (beam / draft) + 0.3696 * waterplane_area_coeff) + 2.38 * (transverse_sectional_area / block_coeff)
+
+    return wetted_surface_area
