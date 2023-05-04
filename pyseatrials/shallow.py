@@ -4,44 +4,56 @@
 __all__ = ['shallow_water_correction']
 
 # %% ../nbs/07_shallow_water.ipynb 7
-def shallow_water_correction(Cv_prime: float, rho: float, Vs: float, S: float, T_M: float, h: float, 
-                             L_pp: float, B: float, C_B: float, P_D_shallow: float, eta_Did: float, R_V_deep=None) -> tuple[float, float, float]:
+import numpy as np
+
+def shallow_water_correction(coef_friction: float, #the coefficient of viscous friction [none]
+                             water_density: float, # Water density [kg/m^3]
+                             stw: float,  # speed through water [m/s^2]
+                             wetted_surface_area: float, # The wetted surface area of the ships hull [m^2]
+                             draught: float, #The druaght at mid-ship [m]
+                             water_depth: float, # The depth of the water [m]
+                             L_pp: float, #The length between perpendiculars of the ship [m]
+                             beam: float, #The beam of the ship [m]
+                             C_B: float, #The block coefficient of the ship [none]
+                             power: float, #The engine power [kW]
+                             propulsive_efficiency: float,  #The propulsive efficiency of the propeller [none]
+                             R_V_deep=None #The viscous friction experienced by the ship, this is left as none and used internally by the function
+                             ) -> tuple[float, float, float]: # Returns 3 values the equivalent deep water power, the sinkage, the viscous resistance correction
     """
     Perform Raven corrections for shallow water performance
-
     """
     # Calculate viscous friction in deep water if not provided
     if R_V_deep is None:
-        R_V_deep = Cv_prime * 0.5 * rho * Vs**2 * S
-    
+        R_V_deep = coef_friction * 0.5 * water_density * stw**2 * wetted_surface_area
+
     # Calculate the viscous resistance correction
-    R_V = R_V_deep * 0.57 * (T_M / h)**1.79
-    
+    R_V = R_V_deep * 0.57 * (draught /water_depth)**1.79
+
     # Calculate the sinkage
-    displacement = L_pp * B * T_M * C_B
-    Fr_h = Vs / np.sqrt(9.81 * 0.3 * L_pp)
-    Fr_hd = Vs / np.sqrt(9.81 * h)
-    sinkage = 1.46 * displacement / L_pp**2 * (Fr_h**2 / (1 - Fr_h**2) - Fr_hd**2 / (1 - Fr_hd**2))
-    sinkage = max(sinkage, 0)
-    
+    displacement = L_pp * beam * draught * C_B
+    Fr_hd = stw / np.sqrt(9.81 * 0.3 * L_pp)
+    Fr_h = stw / np.sqrt(9.81 *water_depth)
+    sinkage = 1.46 * displacement / L_pp**2 * ((Fr_h**2 / np.sqrt(1 - Fr_h**2)) - (Fr_hd**2 / np.sqrt(1 - Fr_hd**2)))
+    #sinkage = np.maximum(sinkage, 0)
+
     # Calculate additional displacement due to sinkage
-    A_W = L_pp * B
-    #delta displacement is written like this to allow vectorisation
+    A_W = L_pp * beam
     delta_displacement = np.minimum(sinkage * A_W / displacement, 0.05)
-    
+
     # Calculate rsink
     rsink = (1 - delta_displacement)**(2/3)
-    
+
     # Calculate deep water power
-    P_D_deep = (P_D_shallow / rsink) - (R_V * Vs / eta_Did)
-    
+    P_D_deep = (power / rsink) - (R_V * stw / propulsive_efficiency)
+
     # Check if the condition is met
-    condition_met = R_V_deep <= P_D_deep * eta_Did / Vs
-    
+    condition_met = R_V_deep <= P_D_deep * propulsive_efficiency / stw
+
     # If the condition is not met, set R_V_deep to the upper limit and repeat the process
-    if not condition_met:
-        R_V_deep = P_D_deep * eta_Did / Vs
-        P_D_deep, sinkage, R_V = shallow_water_correction(Cv_prime, rho, Vs, S, T_M, h, L_pp, B, C_B, P_D_shallow, eta_Did, R_V_deep)
-    
+    if not np.all(condition_met):
+        R_V_deep = np.where(condition_met, R_V_deep, P_D_deep * propulsive_efficiency / stw)
+        #The recursion only happens once as P_D_deep * propulsive_efficiency / stw is constant
+        P_D_deep, sinkage, R_V = shallow_water_correction(coef_friction, water_density, stw, wetted_surface_area, draught,water_depth, L_pp, beam, C_B, power, propulsive_efficiency, R_V_deep)
+
     return P_D_deep, sinkage, R_V
 
