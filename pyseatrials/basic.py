@@ -2,7 +2,8 @@
 
 # %% auto 0
 __all__ = ['dynamic_viscosity', 'kinematic_viscosity_fn', 'reynolds_number_fn', 'froude_number_fn', 'CF_fn',
-           'roughness_resistance_fn', 'calculate_form_factor', 'calculate_viscous_resistance', 'wetted_surface_area']
+           'roughness_resistance_fn', 'calculate_form_factor', 'calculate_viscous_resistance_coef',
+           'wetted_surface_area']
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 5
 import numpy as np
@@ -95,16 +96,11 @@ def calculate_form_factor(C_B: float, B: float, L_pp: float, T_M: float) -> floa
 
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 45
-def calculate_viscous_resistance(C_F: float, form_factor: float, delta_C_F: float) -> float:
+def calculate_viscous_resistance_coef(C_F: float, #The frictional correlation coefficient
+                                 form_factor: float, #The form factor (1+k)
+                                 delta_C_F: float #The roughness resistance coefficient
+                                 ) -> float: #The coefficient of viscous friction
     """Calculates the viscous resistance coefficient for a vessel.
-
-    Args:
-        C_F: The frictional correlation coefficient
-        form_factor: The form factor (1+k)
-        delta_C_F: The roughness resistance coefficient
-
-    Returns:
-        The viscous resistance coefficient.
     """
     return 1.06 * C_F * form_factor + delta_C_F * C_F
 

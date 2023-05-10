@@ -10,7 +10,7 @@ def shallow_water_correction(coef_friction: float, #the coefficient of viscous f
                              water_density: float, # Water density [kg/m^3]
                              stw: float,  # speed through water [m/s^2]
                              wetted_surface_area: float, # The wetted surface area of the ships hull [m^2]
-                             draught: float, #The druaght at mid-ship [m]
+                             draught: float, #The draught at mid-ship [m]
                              water_depth: float, # The depth of the water [m]
                              L_pp: float, #The length between perpendiculars of the ship [m]
                              beam: float, #The beam of the ship [m]
