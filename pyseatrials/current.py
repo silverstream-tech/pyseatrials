@@ -9,7 +9,15 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
 # %% ../nbs/06_current.ipynb 8
-def estimate_speed_through_water(P_id, V_g, t, T_c, tolerance=1e-6, max_iter=1000):
+def estimate_speed_through_water(power:float, #The engine power, typically the 'ideal condition' is used [W]
+                                 sog:float, #Speed over ground of the vessel [m/s] 
+                                 t:float, #Time difference from current run to first run [hours]
+                                 T_c:float, #Time duration period of the tide typically 12.42 hours [hours]
+                                 tolerance:float=1, #The process terminates when the error falls below the specified threshold in Watts
+                                 max_iter:float=1000, #Max imum number of iterations before process terminates
+                                 p0:list = [0, 1, 3], #the initial guess for the power law coefficients they represent the expeonents a + bX^c [None]
+                                 bounds:tuple = ([0, 0, 2.5], [5000, 20, 3.5]) #Bounds the power law equation to within realistic values
+                                 )-> tuple: # Outputs a tuple of the stw vector, the current vector and the coefficients
 
     def current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c):
         return V_c_C * np.cos((2 * np.pi / T_c) * t) + V_c_S * np.sin((2 * np.pi / T_c) * t) + V_c_T * t + V_c_0
@@ -17,15 +25,15 @@ def estimate_speed_through_water(P_id, V_g, t, T_c, tolerance=1e-6, max_iter=100
     def power_eq(V_s, a, b, q):
         return a + b * V_s**q
     #get initial estimates for the power law curve parameters
-    popt, _ = curve_fit(power_eq, V_g, P_id, p0=[1, 1, 1])
+    popt, _ = curve_fit(power_eq, sog, power, p0=p0, bounds = bounds)
     a, b, q = popt
     
     for i in range(max_iter):
         # Calculate stw
-        V_s = np.power((P_id - a) / b, 1/q)
+        V_s = np.power((power - a) / b, 1/q)
         
         # Calculate current
-        V_c = V_g - V_s
+        V_c = sog - V_s
         
         # FCalucalte current coefs using curve fitting
         popt, _ = curve_fit(lambda t, V_c_C, V_c_S, V_c_T, V_c_0: current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c), t, V_c, p0=[1, 1, 1, 1])
@@ -37,46 +45,52 @@ def estimate_speed_through_water(P_id, V_g, t, T_c, tolerance=1e-6, max_iter=100
         V_c_new = current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c)
         
         # Update update stw
-        V_s = V_g - V_c_new
+        V_s = sog - V_c_new
         
         # Update the power law parameters a, b, and q using curve fitting and new stw estimate
-        popt, _ = curve_fit(power_eq, V_s, P_id, p0=[a, b, q])
+        popt, _ = curve_fit(power_eq, V_s, power, p0=[a, b, q],  bounds = bounds)
         a, b, q = popt
         
         #calculates estimated power using new power law curve
         P_obs = a + b * V_s ** q
         #compare error
-        power_error = sum((P_obs - P_id) ** 2)
+        power_error = sum((P_obs - power) ** 2)
         
         # Check convergence
         if power_error < tolerance:
             break
+
+        current_coefs = (V_c_C, V_c_S, V_c_T, V_c_0)
     
-    return V_s
+    return V_s, V_c_new, current_coefs
 
 
 
-# %% ../nbs/06_current.ipynb 12
-def current_mean_of_means(list_of_speeds:list, # The mean speed over ground across a double run,
-                           start_time:float, # Time in decimal hours when the first run took place,
-                           time_between_runs:float #Time in decimal hours between each run. Note the time difference must be consistent between all runs
-                          ):
+# %% ../nbs/06_current.ipynb 14
+def current_mean_of_means(sog: np.ndarray,  # The mean speed over ground across a double run,
+                          start_time: float,  # Time in decimal hours when the first run took place,
+                          time_between_runs: float  # Time in decimal hours between each run. Note the time difference must be consistent between all runs
+                          ) -> float:  # Outputs a tuple of the stw vector, the current vector and the coefficients
 
     t = start_time
-    delta_t = time_between_runs/2
+    delta_t = time_between_runs / 2
 
-    V_G1, V_G2, V_G3, V_G4 = list_of_speeds
+    V_G1, V_G2, V_G3, V_G4 = sog
     Vs = (V_G1 + 3 * V_G2 + 3 * V_G3 + V_G4) / 8
 
-    A = np.array([  [(t + 3*delta_t)**2, -(t + 3*delta_t), 1],
-                    [(t + 1*delta_t)**2, -(t + 1*delta_t), 1],
-                    [(t - 1*delta_t)**2, -(t - 1*delta_t), 1],
-                    [(t - 3*delta_t)**2, -(t - 3*delta_t), 1]])
+    A = np.array([[t + 3 * delta_t ** 2, -(t + 3 * delta_t), 1],
+                  [t + 1 * delta_t ** 2, -(t + 1 * delta_t), 1],
+                  [t - 1 * delta_t ** 2, -(t - 1 * delta_t), 1],
+                  [t - 3 * delta_t ** 2, -(t - 3 * delta_t), 1]])
 
     b = np.array([V_G1 - Vs, V_G2 - Vs, V_G3 - Vs, V_G4 - Vs])
 
-    x, residuals, rank, singular_values = np.linalg.lstsq(A, b, rcond=None)
+    coefs, residuals, rank, singular_values = np.linalg.lstsq(A, b, rcond=None)
 
+    t_vect = np.array([0, time_between_runs, 2*time_between_runs, 3*time_between_runs])
 
-    return x, residuals
+    current = coefs[0] * t_vect**2 + coefs[1] * t_vect + coefs[2]
 
+    stw = sog + current
+
+    return stw, current, coefs 
