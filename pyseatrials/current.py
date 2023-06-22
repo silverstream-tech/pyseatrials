@@ -8,7 +8,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
-# %% ../nbs/06_current.ipynb 8
+# %% ../nbs/06_current.ipynb 9
 def estimate_speed_through_water(power:float, #The engine power, typically the 'ideal condition' is used [W]
                                  sog:float, #Speed over ground of the vessel [m/s] 
                                  t:float, #Time difference from current run to first run [hours]
@@ -66,7 +66,7 @@ def estimate_speed_through_water(power:float, #The engine power, typically the '
 
 
 
-# %% ../nbs/06_current.ipynb 14
+# %% ../nbs/06_current.ipynb 15
 def current_mean_of_means(sog: np.ndarray,  # The mean speed over ground across a double run,
                           start_time: float,  # Time in decimal hours when the first run took place,
                           time_between_runs: float  # Time in decimal hours between each run. Note the time difference must be consistent between all runs

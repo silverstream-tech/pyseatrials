@@ -58,12 +58,13 @@ def froude_number_fn(stw:float, #speed through water [m/s]
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 32
 def CF_fn(reynolds_number:float, #indicating the type of flow of the water
-       adjustment_value:float = 0.1194 # An adjustment value applied by testing company. Default if from ITTC 57
+          c1:float = 0.075, # An adjustment value dault from ITTC-1957
+          c2:float = 0 #An adjustment value the default is 0
       )-> float: #This is a dimensionaless value
     
     "An essential part of calculating the resistance experienced by the ship"
     
-    return (1 + adjustment_value) * 0.067 / (np.log10(reynolds_number) -2) ** 2   
+    return c1 / (np.log10(reynolds_number) -2) ** 2   + c2
     
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 36
