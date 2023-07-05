@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['dynamic_viscosity', 'kinematic_viscosity_fn', 'reynolds_number_fn', 'froude_number_fn', 'CF_fn',
            'roughness_resistance_fn', 'calculate_form_factor', 'calculate_viscous_resistance_coef',
-           'wetted_surface_area']
+           'calculate_total_resistance_coef', 'wetted_surface_area']
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 4
 import numpy as np
@@ -72,25 +72,24 @@ def roughness_resistance_fn(
                           length:float, #Length of the vessel at waterline [m]
                           reynolds_number:float, # dimensionless value describing flow properties
                           surface_roughness:float = 150e-6, #The default value is outdated an modern hull covering are likely considerably less rough [m]
-                          )-> float: #
+                          )-> float: # The dimensionless friction factor representing surface roughness of the hull
     
+    """ 
+    The function CF_fn calculates a dimensionless value representing the resistance experienced by a ship based on the given parameters.
+    """
+
     ratio_value = surface_roughness / length
     return (11/250)* (ratio_value**(1/3) - 10 * reynolds_number**(-1/3)) + (1/8e3)
     
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 40
-def calculate_form_factor(C_B: float, B: float, L_pp: float, T_M: float) -> float:
+def calculate_form_factor(C_B: float, # The block coefficient
+                          B: float, #Beam of the vessel [m]
+                          L_pp: float, #The length between perpendiculars [m]
+                          T_M: float #The draught at midship [m]
+                          ) -> float: #The dimensionless form factor for the ship
     """
-    Calculate the form factor (1+k) using Gross & Watanabe method.
-    
-    Args:
-    C_B (float): Block coefficient
-    B (float): Beam of the ship
-    L_pp (float): Length between perpendiculars
-    T_M (float): Draught at midship
-    
-    Returns:
-    float: Form factor (1+k)
+    The function `calculate_form_factor` calculates the dimensionless form factor (1+k) for a ship using the Gross & Watanabe method.
     """
     k = 1.017 + 20 * C_B * (B / L_pp)**2 * (T_M / B)**0.5
     return k
@@ -101,11 +100,27 @@ def calculate_viscous_resistance_coef(C_F: float, #The frictional correlation co
                                  form_factor: float, #The form factor (1+k)
                                  delta_C_F: float #The roughness resistance coefficient
                                  ) -> float: #The coefficient of viscous friction
-    """Calculates the viscous resistance coefficient for a vessel.
+    """
+    The function `calculate_viscous_resistance_coef` calculates the dimensionless viscous resistance coefficient for a vessel based on the given parameters.
     """
     return 1.06 * C_F * form_factor + delta_C_F * C_F
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 51
+def calculate_total_resistance_coef(total_resistance:float, #The total resistive force experienced by the ship [N]
+                                    stw:float, #The speed through water of the ship [m/s]
+                                    wsa:float, #The wetted surface area of the ship [m^2]
+                                    water_density:float = 1026 #The desnity of seawater [kg/m^3]
+                                    )->float: #The dimensionless coefficient of total resistance of the ship
+    
+    """ 
+    The function `calculate_total_resistance_coef` calculates the dimensionless coefficient of total resistance for a ship based on the given parameters.
+    """
+
+    denominator = 0.5 * water_density * wsa * stw**2
+
+    return total_resistance/denominator 
+
+# %% ../nbs/98_basic_hydro_functions.ipynb 55
 def wetted_surface_area(draft: float, #The draft of the ship [m]
                         beam: float, # The beam of the ship [m]
                         length: float, # The length of the ship [m]
@@ -115,7 +130,8 @@ def wetted_surface_area(draft: float, #The draft of the ship [m]
                         transverse_sectional_area: float #The transverse sectional area of the bulb [m^2]
                         )->float:  # The wetted surface area of the ship [m^2]
     """
-    Calculates the wetted surface area of a ship using the Hotropp-Mennen formula.
+    The function `wetted_surface_area` calculates the wetted surface area of a ship using the Hotropp-Mennen formula.
+
     """
 
     wetted_surface_area = length * (2 * draft + beam) * np.sqrt(midship_section_coeff) * (0.453 + 0.4425 * block_coeff - 0.2862 * midship_section_coeff - 0.003467 * (beam / draft) + 0.3696 * waterplane_area_coeff) + 2.38 * (transverse_sectional_area / block_coeff)
