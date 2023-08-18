@@ -67,7 +67,7 @@ def find_gamma_fn(a:int, #magnitude of a
                   constrain_to_positive:bool = False #Should the function return a value between 0 and 2 pi
                  ) -> int:   #the angle in radians between a and the relative magnitude of b
     
-        adjacent_component = b - adjacent_magnitude_fn(a, alpha)
+        adjacent_component = b + adjacent_magnitude_fn(a, alpha)
         opposite_component = opposite_magnitude_fn(a, alpha)
         
         gamma = np.arctan2(opposite_component, adjacent_component)
