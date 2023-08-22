@@ -4,14 +4,14 @@
 __all__ = ['rel2true_speed', 'rel2true_dir', 'true2rel_speed', 'true2rel_dir', 'double_run_average',
            'vertical_position_anemometer']
 
-# %% ../nbs/02_wind.ipynb 4
+# %% ../nbs/02_wind.ipynb 5
 import numpy as np
 import pandas as pd
 from fastcore.test import *
 from .trig import *
 
 
-# %% ../nbs/02_wind.ipynb 7
+# %% ../nbs/02_wind.ipynb 8
 def rel2true_speed(relative_windspeed:float, #speed of wind relative to ship
                             sog:float, #speed over ground
                            relative_wind_direction:float #wind direction relative to ship
@@ -19,7 +19,7 @@ def rel2true_speed(relative_windspeed:float, #speed of wind relative to ship
     "converts a relative wind speed and direction to a true wind speed"
     return law_of_cosines(relative_windspeed, sog, relative_wind_direction)
 
-# %% ../nbs/02_wind.ipynb 17
+# %% ../nbs/02_wind.ipynb 18
 def rel2true_dir(
     relative_wind_speed:float, #Speed of the wind relative to the ship
     sog:float, #Speed of the ship overground
@@ -41,7 +41,7 @@ def rel2true_dir(
     return gamma 
     
 
-# %% ../nbs/02_wind.ipynb 26
+# %% ../nbs/02_wind.ipynb 27
 def true2rel_speed(true_wind_speed:float, #The windspeed over ground
                             sog:float, #Speed over ground of the vessel
                             true_wind_direction:float, #Direction of wind relative to north
@@ -53,7 +53,7 @@ def true2rel_speed(true_wind_speed:float, #The windspeed over ground
     return np.sqrt(true_wind_speed**2 +sog**2 +2*true_wind_speed*sog*np.cos( true_wind_direction - vessel_heading))
            
 
-# %% ../nbs/02_wind.ipynb 33
+# %% ../nbs/02_wind.ipynb 34
 def true2rel_dir(
                             true_wind_speed:float, #The windspeed over ground
                             sog:float, #Speed over ground of the vessel
@@ -68,14 +68,14 @@ def true2rel_dir(
 
     return gamma + 2*np.pi*(gamma<0)*constrain_to_positive
 
-# %% ../nbs/02_wind.ipynb 42
+# %% ../nbs/02_wind.ipynb 43
 def double_run_average(a, b, alpha, beta):
     #it makes no difference if a/2, b/2 is used or average_velocity/2 the result is the same
     average_velocity, average_direction = combine_vectors(a, b, alpha, beta)
 
     return average_velocity/2, average_direction
 
-# %% ../nbs/02_wind.ipynb 46
+# %% ../nbs/02_wind.ipynb 47
 def vertical_position_anemometer(true_wind_speed:float, #True windspeed [m/s]
                                  reference_height:float, #reference height [m]
                                  measured_height:float  # measured height [m]
