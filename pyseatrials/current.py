@@ -5,6 +5,7 @@ __all__ = ['estimate_speed_through_water', 'current_mean_of_means']
 
 # %% ../nbs/06_current.ipynb 2
 import numpy as np
+import pandas as pd
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
