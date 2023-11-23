@@ -334,7 +334,6 @@ def delivered_power_ideal_condition(
     P_dms:float,
     eta_ms:float,
     delta_R:float,
-    R_id:float,
     delta_eta :float,
     delta_t:float, 
     delta_w:float,

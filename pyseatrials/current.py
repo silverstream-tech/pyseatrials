@@ -17,56 +17,77 @@ def estimate_speed_through_water(power:float, #The engine power, typically the '
                                  max_iter:float=1000, #Max imum number of iterations before process terminates
                                  p0:list = [0, 1, 3], #the initial guess for the power law coefficients they represent the expeonents a + bX^c [None]
                                  bounds:tuple = ([0, 0, 2.5], [5000, 20, 3.5]) #Bounds the power law equation to within realistic values
-                                 )-> tuple: # Outputs a tuple of the stw vector, the current vector and the coefficients
-
+                                 )-> tuple: # Outputs a tuple of the stw, current, current coefficients, and speed power coefficints that minimised the error. Also returns a dataframe or the error per iteration
+    
+# Function to calculate current speed
     def current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c):
+        # Calculation using trigonometric functions and linear trend
         return V_c_C * np.cos((2 * np.pi / T_c) * t) + V_c_S * np.sin((2 * np.pi / T_c) * t) + V_c_T * t + V_c_0
 
+    # Function for the power equation
     def power_eq(V_s, a, b, q):
-        return a + b * V_s**q
-    #get initial estimates for the power law curve parameters
-    popt, _ = curve_fit(power_eq, sog, power, p0=p0, bounds = bounds)
-    a, b, q = popt
-    
+        # Power equation with vessel speed as variable
+        return a + b * V_s ** q
+
+    # Get initial estimates for the power law curve parameters
+    popt, _ = curve_fit(power_eq, sog, power, p0=p0, bounds=bounds)
+    a, b, q = popt  # Destructure the parameters
+
+    # Initialize variables for iterative process
+    popt_v = [0, 0, 0, 0]
+    iteration_results = []
+    min_error = float('inf')
+    best_popt = None
+    best_popt_v = None
+
+    # Iterative optimization process
     for i in range(max_iter):
-        # Calculate stw
-        V_s = np.power((power - a) / b, 1/q)
-        
-        # Calculate current
+        # Calculate vessel speed using power law equation
+        V_s = np.power((power - a) / b, 1 / q)
+        # Calculate current speed as the difference between SOG and vessel speed
         V_c = sog - V_s
-        
-        # FCalucalte current coefs using curve fitting
-        popt, _ = curve_fit(lambda t, V_c_C, V_c_S, V_c_T, V_c_0: current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c), t, V_c, p0=[1, 1, 1, 1])
-        
-        # Update V_c_C, V_c_S, V_c_T, V_c_0 using the fitted parameters
-        V_c_C, V_c_S, V_c_T, V_c_0 = popt
-        
-        # Calculate the new current using fitted params
+
+        # Fit the current speed calculation to the data
+        popt_v, _ = curve_fit(lambda t, V_c_C, V_c_S, V_c_T, V_c_0: current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c), t, V_c, p0=popt_v)
+
+        # Update current speed parameters
+        V_c_C, V_c_S, V_c_T, V_c_0 = popt_v
+
+        # Recalculate current speed with updated parameters
         V_c_new = current_speed(t, V_c_C, V_c_S, V_c_T, V_c_0, T_c)
-        
-        # Update update stw
+
+        # Update vessel speed
         V_s = sog - V_c_new
-        
-        # Update the power law parameters a, b, and q using curve fitting and new stw estimate
-        popt, _ = curve_fit(power_eq, V_s, power, p0=[a, b, q],  bounds = bounds)
+
+        # Refit the power law equation with updated vessel speed
+        popt, _ = curve_fit(power_eq, V_s, power, p0=[a, b, q], bounds=bounds)
+
+        # Update power equation parameters
         a, b, q = popt
-        
-        #calculates estimated power using new power law curve
+
+        # Calculate observed power and compute error
         P_obs = a + b * V_s ** q
-        #compare error
         power_error = sum((P_obs - power) ** 2)
-        
-        # Check convergence
+
+        # Store iteration results and check for minimum error
+        iteration_results.append([i, power_error])
+        if power_error < min_error:
+            best_V_s = V_s
+            best_V_c = V_c_new
+            best_popt = (a, b, q)
+            best_popt_v = (V_c_C, V_c_S, V_c_T, V_c_0)
+            min_error = power_error
+
+        # Break the loop if the error is within the tolerance
         if power_error < tolerance:
             break
 
-        current_coefs = (V_c_C, V_c_S, V_c_T, V_c_0)
-    
-    return V_s, V_c_new, current_coefs
+    # Convert iteration results into a DataFrame
+    df = pd.DataFrame(iteration_results, columns=["Iteration", "Power_Error"])
 
+    return best_V_s, best_V_c, best_popt_v, best_popt, df
 
-
-# %% ../nbs/06_current.ipynb 15
+# %% ../nbs/06_current.ipynb 17
 def current_mean_of_means(sog: np.ndarray,  # The mean speed over ground across a double run,
                           start_time: float,  # Time in decimal hours when the first run took place,
                           time_between_runs: float  # Time in decimal hours between each run. Note the time difference must be consistent between all runs
