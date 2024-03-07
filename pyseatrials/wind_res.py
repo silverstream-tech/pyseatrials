@@ -32,7 +32,7 @@ def interpolate_cx(df, #dataframe of the wind resistance dataset
     
     return np.interp(relative_wind_direction, df.angle_of_attack, df[ship_state])
 
-# %% ../nbs/05_wind_resistance_coef.ipynb 26
+# %% ../nbs/05_wind_resistance_coef.ipynb 27
 def _clf(aod:float, #is the lateral projected area of superstructures on deck [m2]
         axv:float, #is the area of maximum transverse section exposed to the winds [m2]
         alv:float, #is the projected lateral area above the waterline [m2]
