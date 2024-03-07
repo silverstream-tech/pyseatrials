@@ -9,8 +9,12 @@ __all__ = ['dynamic_viscosity', 'kinematic_viscosity_fn', 'reynolds_number_fn', 
 import numpy as np
 import pandas as pd
 from fastcore.test import *
+import pkgutil
+from io import BytesIO
+from seawater import dens
+from seawater.library import T90conv
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 6
+# %% ../nbs/98_basic_hydro_functions.ipynb 10
 def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g/kg]
                       temperature:float #The temperature in celsius [C]
                      )->float: #returns values in [kg/ms]
@@ -24,7 +28,7 @@ def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g
     
     return mu_w * (1 + A*salinity + B*salinity**2)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 15
+# %% ../nbs/98_basic_hydro_functions.ipynb 19
 def kinematic_viscosity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typically 1.18e-3 [kg/(ms)]
                           water_density:float = 1026 #The density of water under current conditions [kg/m^3]
                          )-> float: #[m^2/s]
@@ -34,7 +38,7 @@ def kinematic_viscosity_fn(dynamic_viscosity:float = 1.18e-3, #This value is typ
     return dynamic_viscosity/water_density
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 22
+# %% ../nbs/98_basic_hydro_functions.ipynb 26
 def reynolds_number_fn(stw:float, #Speed through water [m/s]
                       length:float, #Length of the vessel, $L_{os}$ Length overall submerged is typically used [m]
                       kinematic_viscosity:float # [m^2/s]
@@ -46,7 +50,7 @@ def reynolds_number_fn(stw:float, #Speed through water [m/s]
     
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 27
+# %% ../nbs/98_basic_hydro_functions.ipynb 31
 def froude_number_fn(stw:float, #speed through water [m/s]
                     length:float,#Length of vessel, typically $L_{wl}$ Length of waterline [m]
                     gravity:float = 9.81 #acceleration due to gravity [m/s^2]
@@ -56,7 +60,7 @@ def froude_number_fn(stw:float, #speed through water [m/s]
     
     return stw/np.sqrt(gravity * length)
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 32
+# %% ../nbs/98_basic_hydro_functions.ipynb 36
 def CF_fn(reynolds_number:float, #indicating the type of flow of the water
           c1:float = 0.075, # An adjustment value dault from ITTC-1957
           c2:float = 0 #An adjustment value the default is 0
@@ -67,7 +71,7 @@ def CF_fn(reynolds_number:float, #indicating the type of flow of the water
     return c1 / (np.log10(reynolds_number) -2) ** 2   + c2
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 36
+# %% ../nbs/98_basic_hydro_functions.ipynb 40
 def roughness_resistance_fn(
                           length:float, #Length of the vessel at waterline [m]
                           reynolds_number:float, # dimensionless value describing flow properties
@@ -82,7 +86,7 @@ def roughness_resistance_fn(
     return (11/250)* (ratio_value**(1/3) - 10 * reynolds_number**(-1/3)) + (1/8e3)
     
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 40
+# %% ../nbs/98_basic_hydro_functions.ipynb 44
 def calculate_form_factor(C_B: float, # The block coefficient
                           B: float, #Beam of the vessel [m]
                           L_pp: float, #The length between perpendiculars [m]
@@ -95,7 +99,7 @@ def calculate_form_factor(C_B: float, # The block coefficient
     return k
 
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 44
+# %% ../nbs/98_basic_hydro_functions.ipynb 48
 def calculate_viscous_resistance_coef(C_F: float, #The frictional correlation coefficient
                                  form_factor: float, #The form factor (1+k)
                                  delta_C_F: float #The roughness resistance coefficient
@@ -105,7 +109,7 @@ def calculate_viscous_resistance_coef(C_F: float, #The frictional correlation co
     """
     return 1.06 * C_F * form_factor + delta_C_F * C_F
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 51
+# %% ../nbs/98_basic_hydro_functions.ipynb 55
 def calculate_total_resistance_coef(total_resistance:float, #The total resistive force experienced by the ship [N]
                                     stw:float, #The speed through water of the ship [m/s]
                                     wsa:float, #The wetted surface area of the ship [m^2]
@@ -120,7 +124,7 @@ def calculate_total_resistance_coef(total_resistance:float, #The total resistive
 
     return total_resistance/denominator 
 
-# %% ../nbs/98_basic_hydro_functions.ipynb 55
+# %% ../nbs/98_basic_hydro_functions.ipynb 59
 def wetted_surface_area(draft: float, #The draft of the ship [m]
                         beam: float, # The beam of the ship [m]
                         length: float, # The length of the ship [m]
