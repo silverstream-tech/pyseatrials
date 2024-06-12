@@ -21,9 +21,8 @@ def load_water_properties() -> pd.DataFrame:
     Returns:
         pd.DataFrame: dataframe of water properties
     """    
-    water_properties = pkgutil.get_data('pyseatrials', 'water_properties/dyn_visc.csv')
-    water_properties_df = pd.read_csv(BytesIO(water_properties), index_col=0)
-    water_properties_df.columns = water_properties_df.columns.astype(int)
+    water_properties = pkgutil.get_data('pyseatrials', 'water_properties/dyn_visc.parquet')
+    water_properties_df = pd.read_parquet(BytesIO(water_properties))
     
     return water_properties_df
 
