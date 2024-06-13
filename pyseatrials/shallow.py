@@ -6,17 +6,19 @@ __all__ = ['shallow_water_correction']
 # %% ../nbs/07_shallow_water.ipynb 7
 import numpy as np
 
-def shallow_water_correction(coef_friction: float, #the coefficient of viscous friction [none]
-                             water_density: float, # Water density [kg/m^3]
+def shallow_water_correction(coef_visc_frict: float, #the coefficient of viscous friction [none]
                              stw: float,  # speed through water [m/s^2]
-                             wetted_surface_area: float, # The wetted surface area of the ships hull [m^2]
-                             draught: float, #The draught at mid-ship [m]
-                             water_depth: float, # The depth of the water [m]
                              L_pp: float, #The length between perpendiculars of the ship [m]
                              beam: float, #The beam of the ship [m]
+                             draught: float, #The draught at mid-ship [m]
                              C_B: float, #The block coefficient of the ship [none]
+                             displacement: float, # The measured displacement from the trial [m^3]
+                             wetted_surface_area: float, # The wetted surface area of the ships hull [m^2]
+                             waterplane_area: float, #area of the waterline from the trail [m^2]
                              power: float, #The engine power [kW]
-                             propulsive_efficiency: float,  #The propulsive efficiency of the propeller [none]
+                             etad: float,  #The propulsive efficiency of the propeller [none]
+                             water_density: float, # Water density [kg/m^3]
+                             water_depth: float, # The depth of the water [m]
                              R_V_deep=None #The viscous friction experienced by the ship, this is left as none and used internally by the function
                              ) -> tuple[float, float, float]: # Returns 3 values the equivalent deep water power, the sinkage, the viscous resistance correction
     """
@@ -24,36 +26,37 @@ def shallow_water_correction(coef_friction: float, #the coefficient of viscous f
     """
     # Calculate viscous friction in deep water if not provided
     if R_V_deep is None:
-        R_V_deep = coef_friction * 0.5 * water_density * stw**2 * wetted_surface_area
+        R_V_deep = coef_visc_frict * 0.5 * water_density * stw**2 * wetted_surface_area
 
     # Calculate the viscous resistance correction
     R_V = R_V_deep * 0.57 * (draught /water_depth)**1.79
 
     # Calculate the sinkage
-    displacement = L_pp * beam * draught * C_B
     Fr_hd = stw / np.sqrt(9.81 * 0.3 * L_pp)
-    Fr_h = stw / np.sqrt(9.81 *water_depth)
-    sinkage = 1.46 * displacement / L_pp**2 * ((Fr_h**2 / np.sqrt(1 - Fr_h**2)) - (Fr_hd**2 / np.sqrt(1 - Fr_hd**2)))
+    Fr_h = stw / np.sqrt(9.81 * water_depth)
+    sinkage = 1.46 * displacement / L_pp ** 2 * ((Fr_h**2 / np.sqrt(1 - Fr_h**2)) - (Fr_hd**2 / np.sqrt(1 - Fr_hd ** 2)))
     #sinkage = np.maximum(sinkage, 0)
 
     # Calculate additional displacement due to sinkage
-    A_W = L_pp * beam
-    delta_displacement = np.minimum(sinkage * A_W / displacement, 0.05)
+    delta_displacement = np.minimum(sinkage * waterplane_area / displacement, 0.05)
 
     # Calculate rsink
-    rsink = (1 - delta_displacement)**(2/3)
+    rsink = (1 + delta_displacement)**(2/3)
 
     # Calculate deep water power
-    P_D_deep = (power / rsink) - (R_V * stw / propulsive_efficiency)
+    P_D_deep = (power / rsink) - (R_V * stw / etad)
 
     # Check if the condition is met
-    condition_met = R_V_deep <= P_D_deep * propulsive_efficiency / stw
+    condition_met = R_V_deep <= (P_D_deep * etad / stw)
 
     # If the condition is not met, set R_V_deep to the upper limit and repeat the process
     if not np.all(condition_met):
-        R_V_deep = np.where(condition_met, R_V_deep, P_D_deep * propulsive_efficiency / stw)
-        #The recursion only happens once as P_D_deep * propulsive_efficiency / stw is constant
-        P_D_deep, sinkage, R_V = shallow_water_correction(coef_friction, water_density, stw, wetted_surface_area, draught,water_depth, L_pp, beam, C_B, power, propulsive_efficiency, R_V_deep)
+        R_V_deep = np.where(condition_met, R_V_deep, P_D_deep * etad / stw)
+        #The recursion only happens once as P_D_deep * etad / stw is constant
+        P_D_deep, sinkage, R_V = shallow_water_correction(coef_visc_frict, stw, L_pp, beam, draught,
+                                                          C_B, displacement, wetted_surface_area,
+                                                          waterplane_area, power, etad,
+                                                          water_density, water_depth, R_V_deep)
 
     return P_D_deep, sinkage, R_V
 
