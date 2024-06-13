@@ -21,8 +21,9 @@ def load_water_properties() -> pd.DataFrame:
     Returns:
         pd.DataFrame: dataframe of water properties
     """    
-    water_properties = pkgutil.get_data('pyseatrials', 'water_properties/dyn_visc.parquet')
-    water_properties_df = pd.read_parquet(BytesIO(water_properties))
+    water_properties = pkgutil.get_data('pyseatrials', 'water_properties/dyn_visc.csv')
+    water_properties_df = pd.read_csv(BytesIO(water_properties), index_col=0)
+    water_properties_df.columns = water_properties_df.columns.astype(int)
     
     return water_properties_df
 
@@ -60,7 +61,7 @@ def dynamic_viscosity(salinity:float, #A positive value of the water salinity [g
     
     A = 1.541 + 1.998 * temperature * 10**(-2) - 9.52 * temperature**2 * 10 ** (-5)
     B = 7.974 - 7.561 * temperature * 10**(-2) - 7.724 * temperature**2 * 10 ** (-4)
-    
+     
     return mu_w * (1 + A*salinity + B*salinity**2)
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 19
