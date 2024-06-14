@@ -142,7 +142,7 @@ def calculate_viscous_resistance_coef(C_F: float, #The frictional correlation co
     """
     The function `calculate_viscous_resistance_coef` calculates the dimensionless viscous resistance coefficient for a vessel based on the given parameters.
     """
-    return 1.06 * C_F * form_factor + delta_C_F * C_F
+    return 1.06 * C_F * form_factor + delta_C_F
 
 # %% ../nbs/98_basic_hydro_functions.ipynb 55
 def calculate_total_resistance_coef(total_resistance:float, #The total resistive force experienced by the ship [N]
