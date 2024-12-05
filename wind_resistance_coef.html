@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="datasets of wind coefficients for a range of generic ship types">
+
+<title>Wind resistance coefficients (wind_res) – pyseatrials</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ebc57992554dae5230fa85c1bd5a55fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Wind resistance coefficients (wind_res) – pyseatrials">
+<meta property="og:description" content="datasets of wind coefficients for a range of generic ship types">
+<meta property="og:image" content="https://JonnoB.github.io/pyseatrials/05_wind_resistance_coef_files/figure-html/cell-12-output-1.png">
+<meta property="og:site_name" content="pyseatrials">
+<meta property="og:image:height" content="413">
+<meta property="og:image:width" content="559">
+<meta name="twitter:title" content="Wind resistance coefficients (wind_res) – pyseatrials">
+<meta name="twitter:description" content="datasets of wind coefficients for a range of generic ship types">
+<meta name="twitter:image" content="https://JonnoB.github.io/pyseatrials/05_wind_resistance_coef_files/figure-html/cell-12-output-1.png">
+<meta name="twitter:image-height" content="413">
+<meta name="twitter:image-width" content="559">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pyseatrials</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./wind_resistance_coef.html">Wind resistance coefficients (wind_res)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">pyseatrials</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">General Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluation of wind data (wind)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wave_resistance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wave Resistance (wave)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Direct Power Analysis (power)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind_resistance_coef.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wind resistance coefficients (wind_res)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./current.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Current Correction (current)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./shallow_water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shallow water corrections (shallow)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./full_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Which ship is best?</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./trig.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Useful trigonometry (trig)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic_hydro_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Basic hydro functions (basic)</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#load-wind-resistance-coefficients" id="toc-load-wind-resistance-coefficients" class="nav-link active" data-scroll-target="#load-wind-resistance-coefficients"><span class="header-section-number">0.1</span> Load wind resistance coefficients</a>
+  <ul class="collapse">
+  <li><a href="#load_wind_coefficients" id="toc-load_wind_coefficients" class="nav-link" data-scroll-target="#load_wind_coefficients"><span class="header-section-number">0.1.1</span> load_wind_coefficients</a></li>
+  </ul></li>
+  <li><a href="#interpolate-the-wind-loading-coefficients" id="toc-interpolate-the-wind-loading-coefficients" class="nav-link" data-scroll-target="#interpolate-the-wind-loading-coefficients"><span class="header-section-number">0.2</span> Interpolate the wind loading coefficients</a>
+  <ul class="collapse">
+  <li><a href="#interpolate_cx" id="toc-interpolate_cx" class="nav-link" data-scroll-target="#interpolate_cx"><span class="header-section-number">0.2.1</span> interpolate_cx</a></li>
+  </ul></li>
+  <li><a href="#fujiwara-regression-formula" id="toc-fujiwara-regression-formula" class="nav-link" data-scroll-target="#fujiwara-regression-formula"><span class="header-section-number">1</span> Fujiwara regression formula</a>
+  <ul class="collapse">
+  <li><a href="#fujiwara" id="toc-fujiwara" class="nav-link" data-scroll-target="#fujiwara"><span class="header-section-number">1.0.1</span> fujiwara</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Wind resistance coefficients (wind_res)</h1>
+</div>
+
+<div>
+  <div class="description">
+    datasets of wind coefficients for a range of generic ship types
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>In order to caluclate the wind resistance experienced by the ship, the wind resistance loading coefficients need to be known. The wind resistance loading coefficients are dependent on the direction the wind is blowing relative to the ship. These coefficients can be found using the following three methods</p>
+<ul>
+<li>Wind tunnel test</li>
+<li>CFD analysis</li>
+<li>Coefficient datasets</li>
+<li>Regression formula by Fujiwara et al.</li>
+</ul>
+<p>The first two and fourth approaches are used to create the coefficients specific for the ship. The third option is used when no such simulations have been performed and are based on a set of generic ship designs.</p>
+<section id="load-wind-resistance-coefficients" class="level2" data-number="0.1">
+<h2 data-number="0.1" class="anchored" data-anchor-id="load-wind-resistance-coefficients"><span class="header-section-number">0.1</span> Load wind resistance coefficients</h2>
+<p>When there has been no wind tunnel test or CDF analysis the wind resistance coefficients must be found using datasets of look up tables representing generic ship designs for a variety of classes. <code>pyseatrials</code> contains the wind loading factor datasets from ITTC. These data sets have been included as 9 dataframes depending on ship type. To load the data frame enter the name of the ship type to load. The available ship types are</p>
+<ul>
+<li>GENERAL_CARGO</li>
+<li>LNG_CARRIER_INT</li>
+<li>CRUISE_FERRY</li>
+<li>280_KDWT_TANKER</li>
+<li>LNG_CARRIER</li>
+<li>HANDY_SIZE_BULK_CARRIER</li>
+<li>6800_TEU_CONTAINERSHIP</li>
+<li>MULTI_PURPOSE_CARRIER</li>
+</ul>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind_res.py#L14" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="load_wind_coefficients" class="level3" data-number="0.1.1">
+<h3 data-number="0.1.1" class="anchored" data-anchor-id="load_wind_coefficients"><span class="header-section-number">0.1.1</span> load_wind_coefficients</h3>
+<blockquote class="blockquote">
+<pre><code> load_wind_coefficients (vessel_type:str)</code></pre>
+</blockquote>
+<p><em>Load a wind coefficient table for a generic ship class. Datasets from ITTC</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>vessel_type</td>
+<td>str</td>
+<td>The name of the vessel type. Must be one of 9 options</td>
+</tr>
+</tbody>
+</table>
+<p>Loading a wind resistance dataset for a specific ship type is straight forward if no other dataset is available.</p>
+<p>All datasets contain angle of attack in both radians and degrees, the subsequent columns refer to the ship state</p>
+<div id="3748ea70-6e20-4d1e-8a61-937d3cd95b07" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>general_cargo <span class="op">=</span> load_wind_coefficients(<span class="st">"GENERAL_CARGO"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>general_cargo</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">angle_of_attack</th>
+<th data-quarto-table-cell-role="th">angle_of_attack_degs</th>
+<th data-quarto-table-cell-role="th">average</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.000000</td>
+<td>0</td>
+<td>-0.60</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.174533</td>
+<td>10</td>
+<td>-0.87</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0.349066</td>
+<td>20</td>
+<td>-1.00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0.523599</td>
+<td>30</td>
+<td>-1.00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0.698132</td>
+<td>40</td>
+<td>-0.88</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>0.872665</td>
+<td>50</td>
+<td>-0.85</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>1.047198</td>
+<td>60</td>
+<td>-0.65</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>1.221730</td>
+<td>70</td>
+<td>-0.42</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>1.396263</td>
+<td>80</td>
+<td>-0.27</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>1.570796</td>
+<td>90</td>
+<td>-0.09</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>1.745329</td>
+<td>100</td>
+<td>0.09</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>1.919862</td>
+<td>110</td>
+<td>0.49</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>2.094395</td>
+<td>120</td>
+<td>0.84</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>2.443461</td>
+<td>140</td>
+<td>1.39</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>2.617994</td>
+<td>150</td>
+<td>1.47</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>2.792527</td>
+<td>160</td>
+<td>1.34</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>2.967060</td>
+<td>170</td>
+<td>0.92</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>3.141593</td>
+<td>180</td>
+<td>0.82</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="interpolate-the-wind-loading-coefficients" class="level2" data-number="0.2">
+<h2 data-number="0.2" class="anchored" data-anchor-id="interpolate-the-wind-loading-coefficients"><span class="header-section-number">0.2</span> Interpolate the wind loading coefficients</h2>
+<p>The dataset loaded previously only contains the load coefficients at specific angles. Interpolation is needed to match these coefficients to the wind acting on the ship.There are many ways to interpolate these values, <code>pyseatrials</code> uses simple linear interpolation. Linear interpolation has been chosen over other approaches as it can be vectorised and reduces package dependencies. In addition the ultimate difference, between e.g.&nbsp;linear vs spline interpolation, in resistive force will be small compared to the magnitude of forces acting on the ship.</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind_res.py#L26" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="interpolate_cx" class="level3" data-number="0.2.1">
+<h3 data-number="0.2.1" class="anchored" data-anchor-id="interpolate_cx"><span class="header-section-number">0.2.1</span> interpolate_cx</h3>
+<blockquote class="blockquote">
+<pre><code> interpolate_cx (df, relative_wind_direction:float, ship_state:str)</code></pre>
+</blockquote>
+<p><em>Find a linearly interpolated value for wind resistance coefficient</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>df</td>
+<td></td>
+<td>dataframe of the wind resistance dataset</td>
+</tr>
+<tr class="even">
+<td>relative_wind_direction</td>
+<td>float</td>
+<td>The angle of the wind relative to the ship [rads]</td>
+</tr>
+<tr class="odd">
+<td>ship_state</td>
+<td>str</td>
+<td>The state of the ship the resistance should be evaluated in. Chosen from the columns of the wind resistance datasets</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>The dimensionless wind resistance coefficient</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Using the example of the general cargo ship using four different wind direction scenarios (0, 55, 180, 280 degrees) we get the interpolated loading coefficients. Some ships have data for different states such as ‘laden’ and ‘ballast’ the General Cargo dataset only has a single state ‘average’.</p>
+<div id="80804e83-4cad-44cc-8980-1df3765ee4c4" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>degs <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">55</span>, <span class="dv">120</span>, <span class="dv">180</span> ]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>rads <span class="op">=</span> np.deg2rad(degs) <span class="co">#convert the degrees to radians</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>cx_vals <span class="op">=</span> interpolate_cx(general_cargo, rads, <span class="st">'average'</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cx_vals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[-0.6  -0.75  0.84  0.82]</code></pre>
+</div>
+</div>
+<div id="f52064d5-2b8f-4b86-aaa3-e4cd353471f7" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The wind resistance coefficients can then be used to find the actual wind resistance experienced by the ship</p>
+<div id="09c58b4e-23a3-400e-9473-4dfadef103a9" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyseatrials.general <span class="im">import</span> <span class="op">*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="f01a155d-3010-4d87-add2-8d9638268ece" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>wind_resistance_linear <span class="op">=</span> wind_resistance(air_density <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                   wind_resistance_coef_rel <span class="op">=</span> cx_vals,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                   wind_resistance_coef_zero <span class="op">=</span> cx_vals[<span class="dv">0</span>],</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                   area <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                   relative_wind_speed <span class="op">=</span> <span class="dv">20</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                   sog <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#convert to kN</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>resistance_linear_kN <span class="op">=</span> np.<span class="bu">round</span>(wind_resistance_linear<span class="op">/</span><span class="dv">1000</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(resistance_linear_kN )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[-54. -72. 119. 116.]</code></pre>
+</div>
+</div>
+<p>Other interpolations methods can be used such as spline interpolation from the <code>scipy</code> library.</p>
+<div id="a0740e14-52e7-42fc-9dc7-b7fe54148e70" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.interpolate <span class="im">import</span> make_interp_spline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="15ef7826-9284-49ff-b22a-aeb195b33ab8" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cx_spline <span class="op">=</span> make_interp_spline(general_cargo[<span class="st">'angle_of_attack'</span>], general_cargo[<span class="st">'average'</span>] )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The difference between the load coefficients produced by the two models can be shown in the plot below. Across the full range there is almost no difference.</p>
+<div id="5b14fe2b-edfc-4491-94ea-e72d85f011b8" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cb9309ee-aaad-44b4-ab5b-10926dfc2118" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">100</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>xvals <span class="op">=</span> np.linspace(<span class="dv">0</span>, np.pi, <span class="dv">50</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>yinterp_lin <span class="op">=</span> np.interp(xvals, general_cargo[<span class="st">'angle_of_attack'</span>], general_cargo[<span class="st">'average'</span>])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>yinterp_spline <span class="op">=</span> cx_spline(xvals)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>plt.plot(general_cargo[<span class="st">'angle_of_attack'</span>], general_cargo[<span class="st">'average'</span>], <span class="st">'ro'</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>plt.plot(xvals, yinterp_lin,<span class="st">'g-'</span>, lw<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Linear'</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>plt.plot(xvals, yinterp_spline,<span class="st">'b-'</span>, lw<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Linear'</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_wind_resistance_coef_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The difference in terms of actual resistive force between linear and spline interpolation is also very small.</p>
+<div id="0f9a89ca-b8ea-4f84-ba24-e781f873176f" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>wind_resistiance_spline <span class="op">=</span> wind_resistance(air_density <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                   wind_resistance_coef_rel <span class="op">=</span> cx_spline(rads),</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                   wind_resistance_coef_zero <span class="op">=</span> cx_spline(rads)[<span class="dv">0</span>],</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                   area <span class="op">=</span> <span class="dv">500</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                   relative_wind_speed <span class="op">=</span> <span class="dv">20</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                   sog <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#convert to kN</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>resitance_spline_kN <span class="op">=</span> np.<span class="bu">round</span>(wind_resistiance_spline<span class="op">/</span><span class="dv">1000</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#difference in wind resistance between the two models in kN</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'difference in kN between the two interpolation methods for all 4 angles of attack '</span><span class="op">+</span><span class="bu">str</span>(resistance_linear_kN <span class="op">-</span> resitance_spline_kN))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>difference in kN between the two interpolation methods for all 4 angles of attack [0. 2. 0. 0.]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="fujiwara-regression-formula" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Fujiwara regression formula</h1>
+<p>The Fujiwara regression formula (<a href="https://doi.org/10.2534/jjasnaoe.2.257">Fujiwara 2006</a>) calcualtes the wind resistance coeficient of a vessel using the ships geometry. It is often considered the default method, due to it’s adaptability to specific ships and the accessability of the input parameters. However, it’s input calculation is somewhat involved, we reccomend reading either the ITTC or ISO15016 Standards for detailed description of its application.</p>
+<p><span class="math display">\[C_{DA} = C_{LF}cos \psi_{WR} + C_{XLI}\left(sin \psi_{WR} - \frac{1}{2}sin \psi_{WR}cos^2 \psi_{WR} \right) sin \psi_{WR}cos \psi_{WR} +C_{ALF}sin \psi_{WR}cos^3 \psi_{WR}\]</span></p>
+<p>with</p>
+<p>for <span class="math display">\[0 \leq \psi_{WR} &lt; 90 [deg]\]</span></p>
+<p><span class="math display">\[ C_{LF} = \beta_{10} + \beta_{11} \frac{A_{LV}}{L_{OA}B} + \beta_{12} \frac{C_{MC}}{L_{OA}} \]</span></p>
+<p><span class="math display">\[ C_{XLI} = \delta_{10} + \delta_{11} \frac{A_{LV}}{L_{OA}h_{BR}} + \delta_{12} \frac{A_{XV}}{Bh_{BR}} \]</span></p>
+<p><span class="math display">\[ C_{ALF} = \epsilon_{10} + \epsilon_{11} \frac{A_{OD}}{A_{LV}} + \epsilon_{12} \frac{B}{L_{OA}} \]</span></p>
+<p>for <span class="math display">\[90 &lt; \psi_{WR} \leq 180 [deg]\]</span></p>
+<p><span class="math display">\[ C_{LF} = \beta_{20} + \beta_{21} \frac{B}{L_{OA}} + \beta_{22} \frac{h_C}{L_{OA}} + \beta_{23} \frac{A_{OD}}{{L_{OA}}^2} + \beta_{24} \frac{A_{XV}}{B^2} \]</span></p>
+<p><span class="math display">\[ C_{XLI} = \delta_{20} + \delta_{21} \frac{A_{LV}}{L_{OA}h_{BR}} + \delta_{22} \frac{A_{XV}}{A_{LV}} + \delta_{23} \frac{B}{L_{OA}} + \delta_{24} \frac{A_{XV}}{Bh_{BR}} \]</span></p>
+<p><span class="math display">\[ C_{ALF} = \epsilon_{20} + \epsilon_{21} \frac{A_{OD}}{A_{LV}} \]</span></p>
+<p>for <span class="math display">\[ \psi_{WR} = 90 [deg]\]</span></p>
+<p><span class="math display">\[ C_{DA| \psi_{WR}=90[deg]} = \frac{1}{2} \left(C_{DA| \psi_{WR}=90[deg] - \mu} + C_{DA| \psi_{WR}=90[deg] + \mu}   \right) \]</span></p>
+<p>Where</p>
+<p><span class="math inline">\(A_{OD}\)</span> is the lateral projected area of superstructures on deck <span class="math inline">\([m^2]\)</span>,</p>
+<p>$ A_{XV} $ is the area of maximum transverse section exposed to the winds $ [m^2] $,</p>
+<p><span class="math inline">\(A_{LV}\)</span> is the projected lateral area above the waterline <span class="math inline">\([m^2]\)</span>,</p>
+<p>$ B $ is the ship breadth $ [m] $,</p>
+<p>$ C_{DA} $ is the wind resistance coefficient [-]</p>
+<p>$ C_{MC} $ is the horizontal distance from midship section to centre of lateral projected area $ A_{LV} $, $ [m^2] $. This is often negative,</p>
+<p>$ h_{BR} $ is the height of top of superstructure (bridge etc) $ [m] $,</p>
+<p>$ h_c $ is the height from the waterline to the centre of lateral projected area $ A_{LV} $, $ [m] $,</p>
+<p>$ L_{OA} $ is the length overall $ [m] $,</p>
+<p>$ $ is the smoothing range, normally 10 $ [deg] $,</p>
+<p>$ _{WR} $ is the relative wind direction $ [deg] $. 0 means head winds</p>
+<p>The non-dimensional parameters $ <em>{ij}, </em>{ij} &nbsp;and &nbsp;_{ij} $ used are shown in the table below</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>i</th>
+<th>j</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td>$ _{ij} $</td>
+<td>1</td>
+<td>0.922</td>
+<td>-0.507</td>
+<td>-1.162</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>2</td>
+<td>-0.018</td>
+<td>5.091</td>
+<td>-10.367</td>
+<td>3.011</td>
+<td>0.341</td>
+</tr>
+<tr class="even">
+<td>$ _{ij} $</td>
+<td>1</td>
+<td>-0.458</td>
+<td>-3.245</td>
+<td>2.313</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>2</td>
+<td>1.901</td>
+<td>-12.727</td>
+<td>-24.407</td>
+<td>40.310</td>
+<td>5.481</td>
+</tr>
+<tr class="even">
+<td>$ _{ij} $</td>
+<td>1</td>
+<td>0.585</td>
+<td>0.906</td>
+<td>-3.239</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>2</td>
+<td>0.314</td>
+<td>1.117</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ITTC equations</strong>: F-1 to F-7</p>
+<p><span class="math inline">\(A_{LV}\)</span> is the projected lateral area above the waterline <span class="math inline">\(\[m^2\]\)</span>,</p>
+<p>$ B $ is the ship breadth $ [m] $,</p>
+<p>$ C_{DA} $ is the wind resistance coefficient [-]</p>
+<p>$ C_{MC} $ is the horizontal distance from midship section to centre of lateral projected area $ A_{LV} $, $ [m^2] $. This is often negative,</p>
+<p>$ h_{BR} $ is the height of top of superstructure (bridge etc) $ [m] $,</p>
+<p>$ h_c $ is the height from the waterline to the centre of lateral projected area $ A_{LV} $, $ [m] $,</p>
+<p>$ L_{OA} $ is the length overall $ [m] $,</p>
+<p>$ $ is the smoothing range, normally 10 $ [deg] $,</p>
+<p>$ _{WR} $ is the relative wind direction $ [deg] $. 0 means head winds</p>
+<p>The non-dimensional parameters $ <em>{ij}, </em>{ij} &nbsp;and &nbsp;_{ij} $ used are shown in the table below</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>i</th>
+<th>j</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td>$ _{ij} $</td>
+<td>1</td>
+<td>0.922</td>
+<td>-0.507</td>
+<td>-1.162</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>2</td>
+<td>-0.018</td>
+<td>5.091</td>
+<td>-10.367</td>
+<td>3.011</td>
+<td>0.341</td>
+</tr>
+<tr class="even">
+<td>$ _{ij} $</td>
+<td>1</td>
+<td>-0.458</td>
+<td>-3.245</td>
+<td>2.313</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>2</td>
+<td>1.901</td>
+<td>-12.727</td>
+<td>-24.407</td>
+<td>40.310</td>
+<td>5.481</td>
+</tr>
+<tr class="even">
+<td>$ _{ij} $</td>
+<td>1</td>
+<td>0.585</td>
+<td>0.906</td>
+<td>-3.239</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>2</td>
+<td>0.314</td>
+<td>1.117</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ITTC equations</strong>: F-1 to F-7</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind_res.py#L190" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="fujiwara" class="level3" data-number="1.0.1">
+<h3 data-number="1.0.1" class="anchored" data-anchor-id="fujiwara"><span class="header-section-number">1.0.1</span> fujiwara</h3>
+<blockquote class="blockquote">
+<pre><code> fujiwara (aod:float, axv:float, alv:float, cmc:float, hc:float,
+           hbr:float, loa:float, b:float, wind_dir:float,
+           smoothing:float=10)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>aod</td>
+<td>float</td>
+<td></td>
+<td>is the lateral projected area of superstructures on deck [m2]</td>
+</tr>
+<tr class="even">
+<td>axv</td>
+<td>float</td>
+<td></td>
+<td>is the area of maximum transverse section exposed to the winds [m2]</td>
+</tr>
+<tr class="odd">
+<td>alv</td>
+<td>float</td>
+<td></td>
+<td>is the projected lateral area above the waterline [m2]</td>
+</tr>
+<tr class="even">
+<td>cmc</td>
+<td>float</td>
+<td></td>
+<td>is the horizontal distance from midship section to centre of lateral projected area ALV, this is often negative. [m2]</td>
+</tr>
+<tr class="odd">
+<td>hc</td>
+<td>float</td>
+<td></td>
+<td>is the height from the waterline to the centre of lateral projected area ALV [m]</td>
+</tr>
+<tr class="even">
+<td>hbr</td>
+<td>float</td>
+<td></td>
+<td>is the height of top of superstructure (bridge etc) [m]</td>
+</tr>
+<tr class="odd">
+<td>loa</td>
+<td>float</td>
+<td></td>
+<td>is the length overall [m]</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>float</td>
+<td></td>
+<td>is the ship breadth [m]</td>
+</tr>
+<tr class="odd">
+<td>wind_dir</td>
+<td>float</td>
+<td></td>
+<td>is the relative wind direction, 0 means head winds. [deg]</td>
+</tr>
+<tr class="even">
+<td>smoothing</td>
+<td>float</td>
+<td>10</td>
+<td>is the smoothing range, normally 10 degrees. [deg]</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>returns the wind coefficient in the longitudinal direction [-]</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="caefa419" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>wind_dir <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">361</span>, <span class="dv">5</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>cx <span class="op">=</span> [fujiwara(aod <span class="op">=</span> <span class="dv">905</span>, axv <span class="op">=</span> <span class="dv">1750</span>, alv <span class="op">=</span> <span class="dv">7400</span>, cmc <span class="op">=</span> <span class="op">-</span><span class="fl">6.6</span>, hc <span class="op">=</span> <span class="fl">11.72</span>, hbr <span class="op">=</span> <span class="fl">40.7</span>, loa <span class="op">=</span> <span class="dv">340</span>, b <span class="op">=</span> <span class="dv">62</span>, wind_dir <span class="op">=</span> i, smoothing <span class="op">=</span> <span class="dv">10</span>) <span class="cf">for</span> i <span class="kw">in</span> wind_dir]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>plt.plot(wind_dir, cx)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Wind Angle [deg]'</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Wind Coefficient [-]'</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>plt.xticks(np.arange(<span class="dv">0</span>,<span class="dv">361</span>,<span class="dv">45</span>))</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>plt.grid()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_wind_resistance_coef_files/figure-html/cell-15-output-1.png" width="579" height="432" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/JonnoB\.github\.io\/pyseatrials");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

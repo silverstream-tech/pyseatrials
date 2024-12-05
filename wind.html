@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="functions for working with and converting wind data">
+
+<title>Evaluation of wind data (wind) – pyseatrials</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ebc57992554dae5230fa85c1bd5a55fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Evaluation of wind data (wind) – pyseatrials">
+<meta property="og:description" content="functions for working with and converting wind data">
+<meta property="og:site_name" content="pyseatrials">
+<meta name="twitter:title" content="Evaluation of wind data (wind) – pyseatrials">
+<meta name="twitter:description" content="functions for working with and converting wind data">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pyseatrials</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./wind.html">Evaluation of wind data (wind)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">pyseatrials</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">General Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Evaluation of wind data (wind)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wave_resistance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wave Resistance (wave)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Direct Power Analysis (power)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind_resistance_coef.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wind resistance coefficients (wind_res)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./current.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Current Correction (current)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./shallow_water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shallow water corrections (shallow)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./full_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Which ship is best?</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./trig.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Useful trigonometry (trig)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic_hydro_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Basic hydro functions (basic)</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#true-wind" id="toc-true-wind" class="nav-link active" data-scroll-target="#true-wind"><span class="header-section-number">1</span> True Wind</a>
+  <ul class="collapse">
+  <li><a href="#speed" id="toc-speed" class="nav-link" data-scroll-target="#speed"><span class="header-section-number">1.1</span> Speed</a></li>
+  <li><a href="#rel2true_speed" id="toc-rel2true_speed" class="nav-link" data-scroll-target="#rel2true_speed"><span class="header-section-number">1.2</span> rel2true_speed</a></li>
+  <li><a href="#direction" id="toc-direction" class="nav-link" data-scroll-target="#direction"><span class="header-section-number">1.3</span> Direction</a></li>
+  <li><a href="#rel2true_dir" id="toc-rel2true_dir" class="nav-link" data-scroll-target="#rel2true_dir"><span class="header-section-number">1.4</span> rel2true_dir</a></li>
+  </ul></li>
+  <li><a href="#relative-wind" id="toc-relative-wind" class="nav-link" data-scroll-target="#relative-wind"><span class="header-section-number">2</span> Relative Wind</a>
+  <ul class="collapse">
+  <li><a href="#speed-1" id="toc-speed-1" class="nav-link" data-scroll-target="#speed-1"><span class="header-section-number">2.1</span> Speed</a></li>
+  <li><a href="#true2rel_speed" id="toc-true2rel_speed" class="nav-link" data-scroll-target="#true2rel_speed"><span class="header-section-number">2.2</span> true2rel_speed</a></li>
+  <li><a href="#direction-1" id="toc-direction-1" class="nav-link" data-scroll-target="#direction-1"><span class="header-section-number">2.3</span> Direction</a></li>
+  <li><a href="#true2rel_dir" id="toc-true2rel_dir" class="nav-link" data-scroll-target="#true2rel_dir"><span class="header-section-number">2.4</span> true2rel_dir</a></li>
+  </ul></li>
+  <li><a href="#average-wind-speed-and-direction-across-a-double-run" id="toc-average-wind-speed-and-direction-across-a-double-run" class="nav-link" data-scroll-target="#average-wind-speed-and-direction-across-a-double-run"><span class="header-section-number">3</span> Average wind speed and direction across a double run</a>
+  <ul class="collapse">
+  <li><a href="#double_run_average" id="toc-double_run_average" class="nav-link" data-scroll-target="#double_run_average"><span class="header-section-number">3.1</span> double_run_average</a></li>
+  </ul></li>
+  <li><a href="#correcting-for-the-height-of-the-anemometer" id="toc-correcting-for-the-height-of-the-anemometer" class="nav-link" data-scroll-target="#correcting-for-the-height-of-the-anemometer"><span class="header-section-number">4</span> Correcting for the height of the Anemometer</a>
+  <ul class="collapse">
+  <li><a href="#vertical_position_anemometer" id="toc-vertical_position_anemometer" class="nav-link" data-scroll-target="#vertical_position_anemometer"><span class="header-section-number">4.1</span> vertical_position_anemometer</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Evaluation of wind data (wind)</h1>
+</div>
+
+<div>
+  <div class="description">
+    functions for working with and converting wind data
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>Equations in this section are the equivalent to the equations in appendix E of ITTC. However, mostly the functions here are a wrapper over the functions found in the <code>trig</code> module</p>
+<p>Remember that windspeed is ALWAYS positive, the direction tells you if it is helping or hindering the ship. Negative wind speeds are positive windspeeds rotated <span class="math inline">\(180^\circ\)</span>.</p>
+<p>Understanding wind directions and speeds, aswell as their conversion into relative and true forms can be confusing, the below figures aim to clarify how this works</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><embed src="./images/ship_position.pdf" class="img-fluid"></p>
+<figcaption>Basic ship position</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><embed src="./images/ship_wind.pdf" class="img-fluid"></p>
+<figcaption>Wind ship relations</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><embed src="./images/wind_triangles.pdf" class="img-fluid"></p>
+<figcaption>Wind triangle</figcaption>
+</figure>
+</div>
+<section id="true-wind" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="true-wind"><span class="header-section-number">1</span> True Wind</h2>
+<p>The two functions in this section convert relative wind speed and direction to thier True equivalents.</p>
+<section id="speed" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="speed"><span class="header-section-number">1.1</span> Speed</h3>
+<p>Calculating true windspeed from relative windspeed and direction</p>
+<p><span class="math display">\[V_\textrm{WR} = \sqrt{V_{WR}^2 + V_G^2 - 2V_{WR} V_G \cos(\psi_{WR})}\]</span></p>
+<p><strong>ITTC equations</strong>: E-2</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L15" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="rel2true_speed" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="rel2true_speed"><span class="header-section-number">1.2</span> rel2true_speed</h3>
+<blockquote class="blockquote">
+<pre><code> rel2true_speed (relative_windspeed:float, sog:float,
+                 relative_wind_direction:float)</code></pre>
+</blockquote>
+<p><em>converts a relative wind speed and direction to a true wind speed</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>relative_windspeed</td>
+<td>float</td>
+<td>speed of wind relative to ship</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td>speed over ground</td>
+</tr>
+<tr class="odd">
+<td>relative_wind_direction</td>
+<td>float</td>
+<td>wind direction relative to ship</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>True windspeed</strong></td>
+</tr>
+</tbody>
+</table>
+<p>If the wind is blowing has a relative angle of 0, (meaning the wind is blowing from the bow to the stern) and has a relative windspeed of 2 knots, then the true windspeed can be calculated as</p>
+<div id="3cbf4935-1732-4e32-ba44-8222e7f15af0" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rel2true_speed(<span class="dv">2</span>, <span class="dv">20</span>, <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>18.0</code></pre>
+</div>
+</div>
+<p>Conversely if the wind is blowing from stern to bow this means the true windspeed is 22</p>
+<div id="226d0716-4856-4288-9d8f-b427ef2da04d" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rel2true_speed(<span class="dv">2</span>, <span class="dv">20</span>, np.pi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>22.0</code></pre>
+</div>
+</div>
+<p>However if the relative angle is <span class="math inline">\(-45^\circ\)</span> then the true windspeed is</p>
+<div id="e77b7fba-7093-47ff-947d-c88393dbb279" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rel2true_speed(<span class="dv">2</span>, <span class="dv">20</span>, <span class="op">-</span>np.pi<span class="op">/</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>18.63951333874026</code></pre>
+</div>
+</div>
+<p>Remember that windspeed is ALWAYS positive, the direction tells you if it is helping or hindering the ship</p>
+</section>
+<section id="direction" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="direction"><span class="header-section-number">1.3</span> Direction</h3>
+<p>How to calculate the true direction from the relative direction.</p>
+<p>$$ _ = ( )</p>
+<p>$$</p>
+<p><strong>ITTC equations</strong>: E-3</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L23" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="rel2true_dir" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="rel2true_dir"><span class="header-section-number">1.4</span> rel2true_dir</h3>
+<blockquote class="blockquote">
+<pre><code> rel2true_dir (relative_wind_speed:float, sog:float,
+               relative_wind_direction:float, vessel_heading:float,
+               constrain_to_positive:bool=True)</code></pre>
+</blockquote>
+<p><em>converts relative wind direction to true wind direction</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>relative_wind_speed</td>
+<td>float</td>
+<td></td>
+<td>Speed of the wind relative to the ship</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td></td>
+<td>Speed of the ship overground</td>
+</tr>
+<tr class="odd">
+<td>relative_wind_direction</td>
+<td>float</td>
+<td></td>
+<td>direction of wind in radians relative to the ship</td>
+</tr>
+<tr class="even">
+<td>vessel_heading</td>
+<td>float</td>
+<td></td>
+<td>The direction of the ship through the water</td>
+</tr>
+<tr class="odd">
+<td>constrain_to_positive</td>
+<td>bool</td>
+<td>True</td>
+<td>Should the function return a value between 0 and 2 pi</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>the true wind directionangle relative to north in radians.</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Considering a ship where the relative wind direction is 0, the relative windspeed is 2, and the ships heading is <span class="math inline">\(45^\circ\)</span> or <span class="math inline">\(\frac{\pi}{2}\)</span>, then the true wind speed is</p>
+<div id="edb66cba-449a-4cde-b0c1-b6a61057c77b" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rel2true_dir(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>5.141592653589793</code></pre>
+</div>
+</div>
+<p>Although by default the wind direction is constrained to return only positive values between <span class="math inline">\(0\)</span> and <span class="math inline">\(2\pi\)</span>, values between <span class="math inline">\(-\frac{\pi}{2}\)</span> and <span class="math inline">\(\frac{\pi}{2}\)</span>, can be created using <code>constrain_to_positive = False</code></p>
+<div id="2b0a6cc3-a499-4133-98d9-ff3da1003b4f" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rel2true_dir(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="dv">2</span>, <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>-1.1415926535897933</code></pre>
+</div>
+</div>
+<div id="e7278687-17f2-41bf-893b-b03f08d4fa8a" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#### bug alert!</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#does this make sense?</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#should it be 180 or zero?</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>rel2true_dir(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>3.141592653589793</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="relative-wind" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="relative-wind"><span class="header-section-number">2</span> Relative Wind</h2>
+<section id="speed-1" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="speed-1"><span class="header-section-number">2.1</span> Speed</h3>
+<p>Calculating relative wind speed from true wind speed and direction as shown in the equation below</p>
+<p><span class="math display">\[V_\textrm{WR} = \sqrt{V_{TW}^2 + V_G^2 + 2V_{TW} V_G \cos(\psi_{WT} - \psi)}\]</span></p>
+<p><strong>ITTC equations</strong>: E-7, E-10</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L45" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="true2rel_speed" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="true2rel_speed"><span class="header-section-number">2.2</span> true2rel_speed</h3>
+<blockquote class="blockquote">
+<pre><code> true2rel_speed (true_wind_speed:float, sog:float,
+                 true_wind_direction:float, vessel_heading:float)</code></pre>
+</blockquote>
+<p><em>converts true windspeed to relative</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>true_wind_speed</td>
+<td>float</td>
+<td>The windspeed over ground</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td>Speed over ground of the vessel</td>
+</tr>
+<tr class="odd">
+<td>true_wind_direction</td>
+<td>float</td>
+<td>Direction of wind relative to north</td>
+</tr>
+<tr class="even">
+<td>vessel_heading</td>
+<td>float</td>
+<td>Direction of vessel in water relative to north</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>returns relative windspeed using the same units entered</strong></td>
+</tr>
+</tbody>
+</table>
+<p>As an example consider a ship travelling at 20 knots with a direction due north. The wind blows due north with a speed of 22 knots</p>
+<div id="935ebc9b-20d0-4c21-a2d3-f140b9774a99" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>true2rel_speed(<span class="dv">22</span>,<span class="dv">20</span>, <span class="dv">0</span>,<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>42.0</code></pre>
+</div>
+</div>
+<div id="c3362b9f-a5e0-4857-9de9-7151d2f88e3f" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>true2rel_speed(<span class="dv">22</span>,<span class="dv">20</span>, <span class="dv">0</span>, np.pi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>2.0</code></pre>
+</div>
+</div>
+</section>
+<section id="direction-1" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="direction-1"><span class="header-section-number">2.3</span> Direction</h3>
+<p>Caclulating relative windspeed from true windspeed and direction</p>
+<p><span class="math display">\[\psi_\textrm{WR} = \text{arctan2}\left( \frac{ V_\textrm{WT} \textrm{sin}(\psi_\textrm{WT} - \psi)}{ V_\textrm{G} + V_\textrm{WT} \textrm{cos}(\psi_\textrm{WT} - \psi)} \right)\]</span></p>
+<p><strong>ITTC equations</strong>: E-6, E-9</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L57" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="true2rel_dir" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="true2rel_dir"><span class="header-section-number">2.4</span> true2rel_dir</h3>
+<blockquote class="blockquote">
+<pre><code> true2rel_dir (true_wind_speed:float, sog:float,
+               true_wind_direction:float, vessel_heading:float,
+               constrain_to_positive:bool=True)</code></pre>
+</blockquote>
+<p><em>converts true direction speed to relative</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>true_wind_speed</td>
+<td>float</td>
+<td></td>
+<td>The windspeed over ground</td>
+</tr>
+<tr class="even">
+<td>sog</td>
+<td>float</td>
+<td></td>
+<td>Speed over ground of the vessel</td>
+</tr>
+<tr class="odd">
+<td>true_wind_direction</td>
+<td>float</td>
+<td></td>
+<td>Direction of wind relative to north</td>
+</tr>
+<tr class="even">
+<td>vessel_heading</td>
+<td>float</td>
+<td></td>
+<td>Direction of vessel in water relative to north</td>
+</tr>
+<tr class="odd">
+<td>constrain_to_positive</td>
+<td>bool</td>
+<td>True</td>
+<td>Should the function return a value between 0 and 2 pi</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>relative wind direction</strong></td>
+</tr>
+</tbody>
+</table>
+<p>We can see that if a ship is heading due north and the true windspeed is also due east. When the ship is at 20 knots and the wind is at 22 knots, the relative direction of the wind is as below</p>
+<div id="63e83bf2-1696-4152-9e08-e4e7008c7582" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>true2rel_dir(<span class="dv">22</span>,<span class="dv">20</span>, np.pi<span class="op">/</span><span class="dv">2</span>,<span class="dv">0</span>, constrain_to_positive<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.8329812666744317</code></pre>
+</div>
+</div>
+<p>If the wind direction is due west, the relative wind direction is the negative of the previous value</p>
+<div id="89661b0f" class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>true2rel_dir(<span class="dv">22</span>,<span class="dv">20</span>, <span class="op">-</span>np.pi<span class="op">/</span><span class="dv">2</span>,<span class="dv">0</span>, constrain_to_positive<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>-0.8329812666744317</code></pre>
+</div>
+</div>
+<p>Unless of course ‘constrain_to_positive’ is set to true</p>
+<div id="e35c1940" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>true2rel_dir(<span class="dv">22</span>,<span class="dv">20</span>, <span class="op">-</span>np.pi<span class="op">/</span><span class="dv">2</span>,<span class="dv">0</span>, constrain_to_positive<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>5.450204040505154</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="average-wind-speed-and-direction-across-a-double-run" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="average-wind-speed-and-direction-across-a-double-run"><span class="header-section-number">3</span> Average wind speed and direction across a double run</h2>
+<p>The ITTC method proposes taking the average windspeed across a double run to average for errors in readings This function is a wrapper round the ‘combine_vectors’ function from the <code>trig</code> module. <span class="math display">\[c \; \text{cos}(\gamma) = a \; \text{cos}(\alpha) + b \; \text{cos}(\beta), \]</span> <span class="math display">\[c \; \text{sin}(\gamma) = a \; \text{sin}(\alpha) + b \; \text{sin}(\beta), \]</span></p>
+<p><span class="math display">\[c = \sqrt{(\frac{c \; \text{cos}(\gamma)^2 + c \; \text{sin}(\gamma)^2}{2})} \]</span></p>
+<p><span class="math display">\[\gamma = \text{arctan2} \left( \frac{c \; \text{cos}(\gamma)}{c \; \text{sin}(\gamma)} \right)\]</span></p>
+<p>Where <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are the true windspeeds of two paired runs and <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are there true direction.</p>
+<p>The function takes the magnitude and angle of two vectors and outputs the magnitude and angle of the resultant vector.</p>
+<p>One can question whether this approach makes physical sense under certain conditions, the user should consider what is happening in the test and consult the reasoning of the ITTC for further details.</p>
+<p><strong>ITTC equations</strong>: E-4, E-5</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L72" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="double_run_average" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="double_run_average"><span class="header-section-number">3.1</span> double_run_average</h3>
+<blockquote class="blockquote">
+<pre><code> double_run_average (a, b, alpha, beta)</code></pre>
+</blockquote>
+<p>In the example below on the first run a ship is faced with a wind of 13m/s blowing from the north, whilst on the second run the wind has dropped to 5m/s and is coming from the east. The function calculates the mean wind speed across both runs.</p>
+<div id="f29e9053" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>wind_speed, wind_direction <span class="op">=</span> double_run_average(a <span class="op">=</span> <span class="dv">13</span>, b <span class="op">=</span> <span class="dv">5</span>, alpha <span class="op">=</span> <span class="dv">0</span>, beta <span class="op">=</span> <span class="fl">1.6</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The wind speed is </span><span class="sc">{0}</span><span class="st"> m/s, the wind direction is </span><span class="sc">{1}</span><span class="st"> radians"</span>.<span class="bu">format</span>(<span class="bu">round</span>(wind_speed, <span class="dv">2</span>), <span class="bu">round</span>(wind_direction, <span class="dv">2</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The wind speed is 6.9 m/s, the wind direction is 0.37 radians</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="correcting-for-the-height-of-the-anemometer" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="correcting-for-the-height-of-the-anemometer"><span class="header-section-number">4</span> Correcting for the height of the Anemometer</h2>
+<p>Adjusts the windspeed taking into account the height of the anemometer on the ship relative to the reference height for windspeed</p>
+<p><span class="math display">\[V_\textrm{WTref} = V_\textrm{WT} \left( \frac{Z_\textrm{ref}}{Z_a} \right)^\frac{1}{9}\]</span></p>
+<p><strong>ITTC equations</strong>: E-8</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wind.py#L79" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="vertical_position_anemometer" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="vertical_position_anemometer"><span class="header-section-number">4.1</span> vertical_position_anemometer</h3>
+<blockquote class="blockquote">
+<pre><code> vertical_position_anemometer (true_wind_speed:float,
+                               reference_height:float,
+                               measured_height:float)</code></pre>
+</blockquote>
+<p><em>Adjusts the windspeed taking into account the height of the anemometer on the ship relative to the reference height for windspeed</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>true_wind_speed</td>
+<td>float</td>
+<td>True windspeed [m/s]</td>
+</tr>
+<tr class="even">
+<td>reference_height</td>
+<td>float</td>
+<td>reference height [m]</td>
+</tr>
+<tr class="odd">
+<td>measured_height</td>
+<td>float</td>
+<td>measured height [m]</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>The true windspeed corrected for measurement height</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The adjusted wind speed differences are often small but the corrections can still influence the final result</p>
+<div id="ab60cd49-2a1b-4474-adec-e448ac9c8768" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>vertical_position_anemometer(<span class="dv">22</span>,<span class="dv">5</span>, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>20.36924367032039</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/JonnoB\.github\.io\/pyseatrials");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Addressing additional resistance caused by changes to viscosity and additional sinkage in shallow water">
+
+<title>Shallow water corrections (shallow) – pyseatrials</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ebc57992554dae5230fa85c1bd5a55fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Shallow water corrections (shallow) – pyseatrials">
+<meta property="og:description" content="Addressing additional resistance caused by changes to viscosity and additional sinkage in shallow water">
+<meta property="og:site_name" content="pyseatrials">
+<meta name="twitter:title" content="Shallow water corrections (shallow) – pyseatrials">
+<meta name="twitter:description" content="Addressing additional resistance caused by changes to viscosity and additional sinkage in shallow water">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pyseatrials</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./shallow_water.html">Shallow water corrections (shallow)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">pyseatrials</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">General Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluation of wind data (wind)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wave_resistance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wave Resistance (wave)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Direct Power Analysis (power)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind_resistance_coef.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wind resistance coefficients (wind_res)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./current.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Current Correction (current)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./shallow_water.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Shallow water corrections (shallow)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./full_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Which ship is best?</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./trig.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Useful trigonometry (trig)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic_hydro_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Basic hydro functions (basic)</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#importing-the-module" id="toc-importing-the-module" class="nav-link active" data-scroll-target="#importing-the-module"><span class="header-section-number">1</span> Importing the module</a></li>
+  <li><a href="#raven-shallow-water-correction" id="toc-raven-shallow-water-correction" class="nav-link" data-scroll-target="#raven-shallow-water-correction"><span class="header-section-number">2</span> Raven shallow water correction</a>
+  <ul class="collapse">
+  <li><a href="#shallow_water_correction" id="toc-shallow_water_correction" class="nav-link" data-scroll-target="#shallow_water_correction"><span class="header-section-number">2.1</span> shallow_water_correction</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Shallow water corrections (shallow)</h1>
+</div>
+
+<div>
+  <div class="description">
+    Addressing additional resistance caused by changes to viscosity and additional sinkage in shallow water
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>When ships pass through shallow water, they experience higher resistance due to changes in the viscous friction and the impact of squatting or sinkage in the water. These effects are due to the water passing under the ship being constricted and thus having a higher velocity. The change in velocity results in a difference in the buoyancy of the ship in accordance with the Bernoulli principle, which states that</p>
+<p><span class="math display">\[P +\frac{1}{2} \rho v^2 + \rho g h = \textrm{Constant}\]</span></p>
+<p>Where <span class="math inline">\(P\)</span> is pressure, <span class="math inline">\(\rho\)</span> is water density, <span class="math inline">\(v\)</span> is the speed through water, <span class="math inline">\(g\)</span> is gravity, and <span class="math inline">\(h\)</span> is the distance from the reference plane. As can be seen, an increase in water velocity must be balanced by a change in at least one of the other two variables. Changes in pressure result in the ship’s buoyancy being reduced, causing it to sink slightly or squat. As the coefficient of friction experienced by the vessel is proportional to the square of the speed through water, the frictional resistance on the ship increases. A secondary effect is that the sinkage exposes an additional surface area of the ship to the water, increasing the friction effects further. Finally, as the ship’s hull gets closer to the sea floor, the boundary layer between the hull and the free-flowing water thickens and becomes more turbulent increasing resistance. As a result of the additional resistance, the engine is required to deliver more power to maintain speed.</p>
+<p>As such, when calculating the performance of a ship in shallow water, care needs to be taken to adjust for the effects this produces or risk misinterpreting the performance results.</p>
+<section id="importing-the-module" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="importing-the-module"><span class="header-section-number">1</span> Importing the module</h2>
+<p>The module is called <code>shallow</code> import as</p>
+<p><code>from pyseatrials.shallow import *</code></p>
+</section>
+<section id="raven-shallow-water-correction" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="raven-shallow-water-correction"><span class="header-section-number">2</span> Raven shallow water correction</h2>
+<p>Although there are several correction approaches to correcting for the effect of shallow water this library uses the method introduced by Raven in 2016 and described fully in <a href="https://doi.org/10.1016/j.oceaneng.2019.106343">Raven 2019</a>. The correction has two component resistance due to changes in viscous friction, resistance due to sinkage.</p>
+<p>Consider the following</p>
+<p><span class="math inline">\(R_{V, \,\textrm{deep}} = C_v'\frac{1}{2} \rho  V_S^2 S\)</span></p>
+<p>Is the viscous friction in deep water, where <span class="math inline">\(C_v'\)</span> is the coeficient of viscous friction, <span class="math inline">\(\rho\)</span> is the density of water, <span class="math inline">\(V_S\)</span> is the speed through water, and <span class="math inline">\(S\)</span> is the wetted surface area</p>
+<p>The correction due to the changes in viscous resistance are given as</p>
+<p><span class="math display">\[ R_{V} = R_{V, \,\textrm{deep}} 0.57 (\frac{T_M}{h})^{1.79},\]</span></p>
+<p>Where, <span class="math inline">\(T_M\)</span> is the draught at midship and <span class="math inline">\(h\)</span> is the water depth.</p>
+<p>The sinkage is calculated using the following method,</p>
+<p><span class="math display">\[d(\textrm{sinkage}) = 1.46 \frac{\nabla}{L_\textrm{pp}^2}\left[
+\frac{\textrm{Fr}_\textrm{h}^2}{\sqrt{1 - \textrm{Fr}_\textrm{h}^2}} -
+\frac{\textrm{Fr}_\textrm{hd}^2}{\sqrt{1 - \textrm{Fr}_\textrm{hd}^2}}
+\right],\]</span></p>
+<p>where L_ is the length between perpendiculars, <span class="math inline">\(\nabla\)</span> is <span class="math inline">\(\nabla = L_\textrm{pp} B T_M C_B\)</span>, and <span class="math inline">\(B\)</span> is the ships beam (m), <span class="math inline">\(C_B\)</span> is the dimensionless block coefficient, <span class="math inline">\(\textrm{Fr}_\textrm{hd}\)</span> is the Froude number where <span class="math inline">\(h = 0.3 L_\textrm{pp}\)</span>, <span class="math inline">\(\textrm{Fr}_\textrm{h}\)</span> is the Froude number where <span class="math inline">\(h\)</span> is water depth. It should be noted that $d() $.</p>
+<p>Additional displacement due to sinkage is then found such that</p>
+<p><span class="math display">\[\delta \nabla =  \begin{cases}
+d(\textrm{sinkage})\frac{A_W}{\nabla} &amp; \text{if } d(\textrm{sinkage})\frac{A_W}{\nabla} &lt; 0.05 \\
+0.05 &amp; \text{if } d(\textrm{sinkage})\frac{A_W}{\nabla} \geq 0.05
+\end{cases} \]</span></p>
+<p>Where <span class="math inline">\(A_W\)</span> is the water plane area. With <span class="math inline">\(\delta nabla\)</span> now known we find the sinkage value using</p>
+<p><span class="math display">\[\textrm{rsink} = (1- \delta \nabla)^\frac{2}{3} \]</span></p>
+<p>We then correct the power shallow water power to deep water power using</p>
+<p><span class="math display">\[P_\textrm{D,deep} = \frac{P_\textrm{D, shallow}}{\textrm{rsink}} - \frac{\Delta R_V V_S}{\eta_{Did}}\]</span></p>
+<p>Finally we perform a check to ensure that</p>
+<p><span class="math display">\[R_{V, \,\textrm{deep}}  \leq  \frac{P_\textrm{D,deep} \eta_\textrm{Did}}{V_s}\]</span></p>
+<p>if the above condition is not satisfied <span class="math inline">\(R_{V, \,\textrm{deep}}\)</span> is set to the upper limit and the process is repeated.</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/shallow.py#L9" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="shallow_water_correction" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="shallow_water_correction"><span class="header-section-number">2.1</span> shallow_water_correction</h3>
+<blockquote class="blockquote">
+<pre><code> shallow_water_correction (coef_visc_frict:float, stw:float, L_pp:float,
+                           beam:float, draught:float, C_B:float,
+                           displacement:float, wetted_surface_area:float,
+                           waterplane_area:float, power:float, etad:float,
+                           water_density:float, water_depth:float,
+                           R_V_deep=None)</code></pre>
+</blockquote>
+<p><em>Perform Raven corrections for shallow water performance</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>coef_visc_frict</td>
+<td>float</td>
+<td></td>
+<td>the coefficient of viscous friction [none]</td>
+</tr>
+<tr class="even">
+<td>stw</td>
+<td>float</td>
+<td></td>
+<td>speed through water [m/s^2]</td>
+</tr>
+<tr class="odd">
+<td>L_pp</td>
+<td>float</td>
+<td></td>
+<td>The length between perpendiculars of the ship [m]</td>
+</tr>
+<tr class="even">
+<td>beam</td>
+<td>float</td>
+<td></td>
+<td>The beam of the ship [m]</td>
+</tr>
+<tr class="odd">
+<td>draught</td>
+<td>float</td>
+<td></td>
+<td>The draught at mid-ship [m]</td>
+</tr>
+<tr class="even">
+<td>C_B</td>
+<td>float</td>
+<td></td>
+<td>The block coefficient of the ship [none]</td>
+</tr>
+<tr class="odd">
+<td>displacement</td>
+<td>float</td>
+<td></td>
+<td>The measured displacement from the trial [m^3]</td>
+</tr>
+<tr class="even">
+<td>wetted_surface_area</td>
+<td>float</td>
+<td></td>
+<td>The wetted surface area of the ships hull [m^2]</td>
+</tr>
+<tr class="odd">
+<td>waterplane_area</td>
+<td>float</td>
+<td></td>
+<td>area of the waterline from the trail [m^2]</td>
+</tr>
+<tr class="even">
+<td>power</td>
+<td>float</td>
+<td></td>
+<td>The engine power [kW]</td>
+</tr>
+<tr class="odd">
+<td>etad</td>
+<td>float</td>
+<td></td>
+<td>The propulsive efficiency of the propeller [none]</td>
+</tr>
+<tr class="even">
+<td>water_density</td>
+<td>float</td>
+<td></td>
+<td>Water density [kg/m^3]</td>
+</tr>
+<tr class="odd">
+<td>water_depth</td>
+<td>float</td>
+<td></td>
+<td>The depth of the water [m]</td>
+</tr>
+<tr class="even">
+<td>R_V_deep</td>
+<td>NoneType</td>
+<td>None</td>
+<td>The viscous friction experienced by the ship, this is left as none and used internally by the function</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>tuple</strong></td>
+<td></td>
+<td><strong>Returns 3 values the equivalent deep water power, the sinkage, the viscous resistance correction</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The example below shows a simple use case</p>
+<div id="cell-7" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>coef_visc_frict <span class="op">=</span> <span class="fl">0.0015</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>stw <span class="op">=</span> np.array([<span class="fl">8.0</span>, <span class="fl">10.0</span>, <span class="fl">12.0</span>])  <span class="co"># m/s</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>L_pp <span class="op">=</span> <span class="fl">200.0</span>  <span class="co"># m</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>beam <span class="op">=</span> <span class="fl">30.0</span>  <span class="co"># m</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>draught <span class="op">=</span> <span class="fl">10.0</span>  <span class="co"># m</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>C_B <span class="op">=</span> <span class="fl">0.7</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>displacement <span class="op">=</span> <span class="fl">16800.0</span> <span class="co"># m^3</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>wetted_surface_area <span class="op">=</span> <span class="fl">2500.0</span>  <span class="co"># m^2</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>waterplane_area <span class="op">=</span> <span class="fl">1920.0</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>power <span class="op">=</span> np.array([<span class="fl">6000.0</span>, <span class="fl">8000.0</span>, <span class="fl">10000.0</span>])<span class="op">*</span><span class="dv">1000</span>  <span class="co"># W</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>etad <span class="op">=</span> <span class="fl">0.7</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>water_density <span class="op">=</span> <span class="fl">1025.0</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>water_depth <span class="op">=</span> np.array([<span class="fl">40.0</span>, <span class="fl">40.0</span>, <span class="fl">40.0</span>])  <span class="co"># m</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Call the function with the example inputs</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>P_D_deep, sinkage, R_V <span class="op">=</span> shallow_water_correction(coef_visc_frict, stw, L_pp, beam, draught,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                                                  C_B, displacement, wetted_surface_area,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                                                  waterplane_area, power, etad,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                                                  water_density, water_depth)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>P_D_deep <span class="op">/=</span> <span class="dv">1000</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the results</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Equivalent deep water power:"</span>, (P_D_deep).astype(<span class="bu">int</span>), <span class="st">"kW"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sinkage:"</span>, np.<span class="bu">round</span>(sinkage,<span class="dv">2</span>), <span class="st">"m"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Viscous resistance correction:"</span>, (R_V).astype(<span class="bu">int</span>), <span class="st">"N"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/JonnoB\.github\.io\/pyseatrials");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

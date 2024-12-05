@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Finding the amount of power required for the ship to travel at the same speed if it were in perfect conditions">
+
+<title>Direct Power Analysis (power) – pyseatrials</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ebc57992554dae5230fa85c1bd5a55fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Direct Power Analysis (power) – pyseatrials">
+<meta property="og:description" content="Finding the amount of power required for the ship to travel at the same speed if it were in perfect conditions">
+<meta property="og:site_name" content="pyseatrials">
+<meta name="twitter:title" content="Direct Power Analysis (power) – pyseatrials">
+<meta name="twitter:description" content="Finding the amount of power required for the ship to travel at the same speed if it were in perfect conditions">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pyseatrials</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./power.html">Direct Power Analysis (power)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">pyseatrials</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">General Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluation of wind data (wind)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wave_resistance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wave Resistance (wave)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./power.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Direct Power Analysis (power)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind_resistance_coef.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wind resistance coefficients (wind_res)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./current.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Current Correction (current)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./shallow_water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shallow water corrections (shallow)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./full_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Which ship is best?</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./trig.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Useful trigonometry (trig)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic_hydro_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Basic hydro functions (basic)</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#understanding-the-notation" id="toc-understanding-the-notation" class="nav-link active" data-scroll-target="#understanding-the-notation"><span class="header-section-number">1</span> Understanding the notation</a></li>
+  <li><a href="#correction-delivered-power" id="toc-correction-delivered-power" class="nav-link" data-scroll-target="#correction-delivered-power"><span class="header-section-number">2</span> Correction delivered power</a>
+  <ul class="collapse">
+  <li><a href="#correction_delivered_power" id="toc-correction_delivered_power" class="nav-link" data-scroll-target="#correction_delivered_power"><span class="header-section-number">2.1</span> correction_delivered_power</a></li>
+  </ul></li>
+  <li><a href="#propulsive-efficiency-correction" id="toc-propulsive-efficiency-correction" class="nav-link" data-scroll-target="#propulsive-efficiency-correction"><span class="header-section-number">3</span> Propulsive efficiency correction</a>
+  <ul class="collapse">
+  <li><a href="#propulsive_efficiency_corr" id="toc-propulsive_efficiency_corr" class="nav-link" data-scroll-target="#propulsive_efficiency_corr"><span class="header-section-number">3.1</span> propulsive_efficiency_corr</a></li>
+  </ul></li>
+  <li><a href="#full-scale-wake-fraction" id="toc-full-scale-wake-fraction" class="nav-link" data-scroll-target="#full-scale-wake-fraction"><span class="header-section-number">4</span> Full scale wake fraction</a>
+  <ul class="collapse">
+  <li><a href="#the-full-scale-wake-fraction" id="toc-the-full-scale-wake-fraction" class="nav-link" data-scroll-target="#the-full-scale-wake-fraction"><span class="header-section-number">4.1</span> The full scale wake fraction</a></li>
+  <li><a href="#full_scale_wake_fraction" id="toc-full_scale_wake_fraction" class="nav-link" data-scroll-target="#full_scale_wake_fraction"><span class="header-section-number">4.2</span> full_scale_wake_fraction</a></li>
+  <li><a href="#full-scale-wake-fraction-from-speed" id="toc-full-scale-wake-fraction-from-speed" class="nav-link" data-scroll-target="#full-scale-wake-fraction-from-speed"><span class="header-section-number">4.3</span> Full-scale wake fraction from speed</a></li>
+  <li><a href="#full_scale_wake_speed" id="toc-full_scale_wake_speed" class="nav-link" data-scroll-target="#full_scale_wake_speed"><span class="header-section-number">4.4</span> full_scale_wake_speed</a></li>
+  <li><a href="#scale-correlation-factor" id="toc-scale-correlation-factor" class="nav-link" data-scroll-target="#scale-correlation-factor"><span class="header-section-number">4.5</span> Scale correlation factor</a></li>
+  <li><a href="#scale_correlation_factor" id="toc-scale_correlation_factor" class="nav-link" data-scroll-target="#scale_correlation_factor"><span class="header-section-number">4.6</span> scale_correlation_factor</a></li>
+  </ul></li>
+  <li><a href="#self-propulsion-factors" id="toc-self-propulsion-factors" class="nav-link" data-scroll-target="#self-propulsion-factors"><span class="header-section-number">5</span> Self propulsion factors</a>
+  <ul class="collapse">
+  <li><a href="#self_propulsion_factors" id="toc-self_propulsion_factors" class="nav-link" data-scroll-target="#self_propulsion_factors"><span class="header-section-number">5.1</span> self_propulsion_factors</a></li>
+  </ul></li>
+  <li><a href="#calculate-thrust-coefficient-torque-coefficient-and-load-factor" id="toc-calculate-thrust-coefficient-torque-coefficient-and-load-factor" class="nav-link" data-scroll-target="#calculate-thrust-coefficient-torque-coefficient-and-load-factor"><span class="header-section-number">6</span> Calculate Thrust coefficient, Torque coefficient, and Load factor</a>
+  <ul class="collapse">
+  <li><a href="#the-inverse-quadratic-method" id="toc-the-inverse-quadratic-method" class="nav-link" data-scroll-target="#the-inverse-quadratic-method"><span class="header-section-number">6.1</span> The inverse quadratic method</a></li>
+  <li><a href="#get_curve_coefficient" id="toc-get_curve_coefficient" class="nav-link" data-scroll-target="#get_curve_coefficient"><span class="header-section-number">6.2</span> get_curve_coefficient</a></li>
+  <li><a href="#the-quadratic-method" id="toc-the-quadratic-method" class="nav-link" data-scroll-target="#the-quadratic-method"><span class="header-section-number">6.3</span> The quadratic method</a></li>
+  <li><a href="#quadratic_method" id="toc-quadratic_method" class="nav-link" data-scroll-target="#quadratic_method"><span class="header-section-number">6.4</span> quadratic_method</a></li>
+  <li><a href="#torque-coefficient-from-propeller-state" id="toc-torque-coefficient-from-propeller-state" class="nav-link" data-scroll-target="#torque-coefficient-from-propeller-state"><span class="header-section-number">6.5</span> Torque coefficient from propeller state</a></li>
+  <li><a href="#torque_coef" id="toc-torque_coef" class="nav-link" data-scroll-target="#torque_coef"><span class="header-section-number">6.6</span> torque_coef</a></li>
+  <li><a href="#load-factor-using-propeller-advance-and-thrust" id="toc-load-factor-using-propeller-advance-and-thrust" class="nav-link" data-scroll-target="#load-factor-using-propeller-advance-and-thrust"><span class="header-section-number">6.7</span> Load factor using propeller advance and thrust</a></li>
+  <li><a href="#load_factor" id="toc-load_factor" class="nav-link" data-scroll-target="#load_factor"><span class="header-section-number">6.8</span> load_factor</a></li>
+  <li><a href="#load-factor-using-resistance-and-propellor-state" id="toc-load-factor-using-resistance-and-propellor-state" class="nav-link" data-scroll-target="#load-factor-using-resistance-and-propellor-state"><span class="header-section-number">6.9</span> Load factor using resistance and propellor state</a></li>
+  <li><a href="#load_factor_resistance" id="toc-load_factor_resistance" class="nav-link" data-scroll-target="#load_factor_resistance"><span class="header-section-number">6.10</span> load_factor_resistance</a></li>
+  </ul></li>
+  <li><a href="#trial-propeller-advance" id="toc-trial-propeller-advance" class="nav-link" data-scroll-target="#trial-propeller-advance"><span class="header-section-number">7</span> Trial propeller advance</a>
+  <ul class="collapse">
+  <li><a href="#propeller_advance_coefficient" id="toc-propeller_advance_coefficient" class="nav-link" data-scroll-target="#propeller_advance_coefficient"><span class="header-section-number">7.1</span> propeller_advance_coefficient</a></li>
+  </ul></li>
+  <li><a href="#open-water-efficiency" id="toc-open-water-efficiency" class="nav-link" data-scroll-target="#open-water-efficiency"><span class="header-section-number">8</span> Open water efficiency</a>
+  <ul class="collapse">
+  <li><a href="#open_water_efficiency" id="toc-open_water_efficiency" class="nav-link" data-scroll-target="#open_water_efficiency"><span class="header-section-number">8.1</span> open_water_efficiency</a></li>
+  </ul></li>
+  <li><a href="#speed-of-flow-into-the-propeller" id="toc-speed-of-flow-into-the-propeller" class="nav-link" data-scroll-target="#speed-of-flow-into-the-propeller"><span class="header-section-number">9</span> Speed of flow into the propeller</a>
+  <ul class="collapse">
+  <li><a href="#propeller_flow" id="toc-propeller_flow" class="nav-link" data-scroll-target="#propeller_flow"><span class="header-section-number">9.1</span> propeller_flow</a></li>
+  </ul></li>
+  <li><a href="#total-resistance" id="toc-total-resistance" class="nav-link" data-scroll-target="#total-resistance"><span class="header-section-number">10</span> Total Resistance</a>
+  <ul class="collapse">
+  <li><a href="#total_resistance" id="toc-total_resistance" class="nav-link" data-scroll-target="#total_resistance"><span class="header-section-number">10.1</span> total_resistance</a></li>
+  </ul></li>
+  <li><a href="#corrected-propeller-shaft-speed" id="toc-corrected-propeller-shaft-speed" class="nav-link" data-scroll-target="#corrected-propeller-shaft-speed"><span class="header-section-number">11</span> Corrected propeller shaft speed</a>
+  <ul class="collapse">
+  <li><a href="#propeller_speed" id="toc-propeller_speed" class="nav-link" data-scroll-target="#propeller_speed"><span class="header-section-number">11.1</span> propeller_speed</a></li>
+  </ul></li>
+  <li><a href="#power-in-the-ideal-conditions" id="toc-power-in-the-ideal-conditions" class="nav-link" data-scroll-target="#power-in-the-ideal-conditions"><span class="header-section-number">12</span> Power in the ideal conditions</a>
+  <ul class="collapse">
+  <li><a href="#calculate-values-in-the-trial-condition" id="toc-calculate-values-in-the-trial-condition" class="nav-link" data-scroll-target="#calculate-values-in-the-trial-condition"><span class="header-section-number">12.1</span> Calculate values in the trial condition</a></li>
+  <li><a href="#calculate_all_values_from_trial_phase" id="toc-calculate_all_values_from_trial_phase" class="nav-link" data-scroll-target="#calculate_all_values_from_trial_phase"><span class="header-section-number">12.2</span> calculate_all_values_from_trial_phase</a></li>
+  <li><a href="#calculate-values-in-the-ideal-condition" id="toc-calculate-values-in-the-ideal-condition" class="nav-link" data-scroll-target="#calculate-values-in-the-ideal-condition"><span class="header-section-number">12.3</span> Calculate values in the ideal condition</a></li>
+  <li><a href="#calculate_all_values_from_ideal_phase" id="toc-calculate_all_values_from_ideal_phase" class="nav-link" data-scroll-target="#calculate_all_values_from_ideal_phase"><span class="header-section-number">12.4</span> calculate_all_values_from_ideal_phase</a></li>
+  <li><a href="#power-delivered-in-the-ideal-condition" id="toc-power-delivered-in-the-ideal-condition" class="nav-link" data-scroll-target="#power-delivered-in-the-ideal-condition"><span class="header-section-number">12.5</span> Power delivered in the ideal condition</a></li>
+  <li><a href="#delivered_power_ideal_condition" id="toc-delivered_power_ideal_condition" class="nav-link" data-scroll-target="#delivered_power_ideal_condition"><span class="header-section-number">12.6</span> delivered_power_ideal_condition</a></li>
+  </ul></li>
+  <li><a href="#how-it-all-hangs-together" id="toc-how-it-all-hangs-together" class="nav-link" data-scroll-target="#how-it-all-hangs-together"><span class="header-section-number">13</span> How it all hangs together</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Direct Power Analysis (power)</h1>
+</div>
+
+<div>
+  <div class="description">
+    Finding the amount of power required for the ship to travel at the same speed if it were in perfect conditions
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>The calculating of the power transmitted to the water correcting for environmental conditions is</p>
+<p><span class="math display">\[P_{Did} = P_{Dms}-\Delta P,\]</span> where <span class="math inline">\(P_{Dms}\)</span> is the delivered power in the trial conditions, and <span class="math inline">\(\Delta P\)</span> is the correction of the delivered power taking into account the resistances and changes in propulsive power as a result of the trial conditions.</p>
+<p>This section of the <code>pyseatrials</code> library is concerned with deriving the values needed for this calculation</p>
+<p>Some things should come with a bit more clarification e.g.&nbsp;‘wake-fraction’, what is it?</p>
+<section id="understanding-the-notation" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="understanding-the-notation"><span class="header-section-number">1</span> Understanding the notation</h2>
+<p>There are severl sub-scripts used in this section which are useful to understand</p>
+<p>There are four types of upper case letter used which require further explanation</p>
+<ul>
+<li><strong>D</strong> ‘Delivered’ used to differentiate types of power</li>
+<li><strong>M</strong> ‘Model’ used for values taken from a model of the ship in a tank test</li>
+<li><strong>R</strong> ‘Relative’ used to differentiate different types of efficiency</li>
+<li><strong>S</strong> ‘Full-scale’ used to distinguish from values derived from models</li>
+</ul>
+<p>The lower case abreviations are</p>
+<ul>
+<li><strong>id</strong> refers to the ‘ideal condition’</li>
+<li><strong>ms</strong> refers to the ‘trial condition’</li>
+</ul>
+</section>
+<section id="correction-delivered-power" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="correction-delivered-power"><span class="header-section-number">2</span> Correction delivered power</h2>
+<p>Calculates the power when correcting for the resistances experienced by the vessel as well as the deciation of propeller efficiency relative to ideal</p>
+<p><span class="math display">\[\Delta P = \frac{\Delta R V_s}{\eta_{Did}}+ P_{Dms}(1-\frac{\eta_{Dms}}{\eta_{Did}}), \]</span> where <span class="math inline">\(\Delta R\)</span> is the total resitance increase experienced by the ship, <span class="math inline">\(V_s\)</span> is the speed through water, <span class="math inline">\(\eta_{Did}\)</span> is the propulsive efficiency coefficient in the ideal conditions, <span class="math inline">\(P_{Dms}\)</span> is the shaft power during the test,<span class="math inline">\(\eta_{Dms}\)</span> is the propulsive efficiency coefficient in the trial conditions.</p>
+<p>The value for <span class="math inline">\(\Delta R\)</span> is calculated as the some of the wind, wave, and water resistances. The functions for these values are found at <a href="https://JonnoB.github.io/pyseatrials/general_functions.html#wind_resistance"><code>wind_resistance</code></a>, <a href="https://JonnoB.github.io/pyseatrials/wave_resistance.html#stawave1_fn"><code>stawave1_fn</code></a>, and <a href="https://JonnoB.github.io/pyseatrials/general_functions.html#temp_salinity_water_resistance"><code>temp_salinity_water_resistance</code></a></p>
+<p><strong>ITTC equations</strong>: J-2</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L16" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="correction_delivered_power" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="correction_delivered_power"><span class="header-section-number">2.1</span> correction_delivered_power</h3>
+<blockquote class="blockquote">
+<pre><code> correction_delivered_power (p_dms:float, resistance_increase:float,
+                             stw:float, eta_id:float, eta_ms:float)</code></pre>
+</blockquote>
+<p><em>calculates the corrected delivered power, used as part of the direct power analysis</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>p_dms</td>
+<td>float</td>
+<td>delivered power [W]</td>
+</tr>
+<tr class="even">
+<td>resistance_increase</td>
+<td>float</td>
+<td>Resistance increase derived from data measured in seatrial</td>
+</tr>
+<tr class="odd">
+<td>stw</td>
+<td>float</td>
+<td>speed through water [m/s]</td>
+</tr>
+<tr class="even">
+<td>eta_id</td>
+<td>float</td>
+<td>propulsive efficiency in the ideal conditions</td>
+</tr>
+<tr class="odd">
+<td>eta_ms</td>
+<td>float</td>
+<td>propulsive efficiency in the seattrial</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>Returns the corrected delivered power in Newtons [N]</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Example of using function, generally this is not used directly</p>
+<div id="a83f7c98-e2ea-4796-beb0-69f0cfabea37" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>correction_delivered_power(<span class="fl">1e4</span>, <span class="fl">1e3</span>, <span class="dv">10</span>, <span class="fl">0.8</span>, <span class="fl">0.7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>13750.000000000002</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="propulsive-efficiency-correction" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="propulsive-efficiency-correction"><span class="header-section-number">3</span> Propulsive efficiency correction</h2>
+<p>This can be used to calculate both the ideal and trial conditions reffered to in equations J-3 and J-5 <span class="math display">\[\eta_D = \eta_o \eta_R \frac{1-t}{1-w_s} \]</span></p>
+<p><strong>ITTC equations</strong> J-3, J-5</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L31" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="propulsive_efficiency_corr" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="propulsive_efficiency_corr"><span class="header-section-number">3.1</span> propulsive_efficiency_corr</h3>
+<blockquote class="blockquote">
+<pre><code> propulsive_efficiency_corr (n_o:float, n_r:float, t:float, w_s:float)</code></pre>
+</blockquote>
+<p><em>Calculates propeller efficiency adjusting for additional resistances</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>n_o</td>
+<td>float</td>
+<td>open water efficiency</td>
+</tr>
+<tr class="even">
+<td>n_r</td>
+<td>float</td>
+<td>relative rotative efficiency</td>
+</tr>
+<tr class="odd">
+<td>t</td>
+<td>float</td>
+<td>thrust deduction factor</td>
+</tr>
+<tr class="even">
+<td>w_s</td>
+<td>float</td>
+<td>full-scale wake fraction</td>
+</tr>
+</tbody>
+</table>
+<div id="89c55e47-828f-4454-a8c1-904dce2afa6a" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>propulsive_efficiency_corr(<span class="fl">0.58</span>, <span class="fl">0.7</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.7308</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="full-scale-wake-fraction" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="full-scale-wake-fraction"><span class="header-section-number">4</span> Full scale wake fraction</h2>
+<p>There are two different functions related to the full scale wake fraction, both are presented in this sub-section.</p>
+<p>The two related but distinct values are</p>
+<ul>
+<li><span class="math inline">\(w_{S}\)</span>: Full-scale wake fraction using model</li>
+<li><span class="math inline">\(w_{S}\)</span>: Full-scale wake fraction using speed</li>
+<li><span class="math inline">\(e_i\)</span> Scale correlation factor of the wake faction</li>
+</ul>
+<section id="the-full-scale-wake-fraction" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="the-full-scale-wake-fraction"><span class="header-section-number">4.1</span> The full scale wake fraction</h3>
+<p><span class="math display">\[w_S =  1- (1- w_M)e_i,\]</span> where <span class="math inline">\(W_S\)</span> is the fullscale wake fraction, <span class="math inline">\(W_m\)</span> is the model wake fraction derived from tank tests, and <span class="math inline">\(e_i\)</span> is the scale correlation factor derived from <strong>XXXX derived from what?</strong>.</p>
+<p><strong>ITTC equation</strong>: J-4, J-20</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L41" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="full_scale_wake_fraction" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="full_scale_wake_fraction"><span class="header-section-number">4.2</span> full_scale_wake_fraction</h3>
+<blockquote class="blockquote">
+<pre><code> full_scale_wake_fraction (wake_fraction_model:float,
+                           scale_correlation_factor:float)</code></pre>
+</blockquote>
+<p><em>used to scale from model results to full-scale vessel</em></p>
+<p>The full scale wake fracrtion returns a value between 0 and 1</p>
+<div id="d881d387-f6c6-4a00-90e9-57585ada983f" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>full_scale_wake_fraction(<span class="fl">0.4</span>, <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.52</code></pre>
+</div>
+</div>
+</section>
+<section id="full-scale-wake-fraction-from-speed" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="full-scale-wake-fraction-from-speed"><span class="header-section-number">4.3</span> Full-scale wake fraction from speed</h3>
+<p>This approach calculates the wake fraction using the measured water speeds</p>
+<p><span class="math display">\[w_S =1- \frac{V_A}{V_S},\]</span> where <span class="math inline">\(V_A\)</span> is the speed of flow into the propeller, and <span class="math inline">\(V_S\)</span> is the ship’s speed through water.</p>
+<p><strong>ITTC equations</strong>: J-17</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L50" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="full_scale_wake_speed" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="full_scale_wake_speed"><span class="header-section-number">4.4</span> full_scale_wake_speed</h3>
+<blockquote class="blockquote">
+<pre><code> full_scale_wake_speed (flow_speed:float, stw:float)</code></pre>
+</blockquote>
+<p><em>Calculate the wake fraction using the measured water speeds</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>flow_speed</td>
+<td>float</td>
+<td>The speed of flow through the propeller</td>
+</tr>
+<tr class="even">
+<td>stw</td>
+<td>float</td>
+<td>Ship’s speed through water</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>This approach to obtianing the full scale wake speed is typically used for getting the trial conditions</p>
+<div id="321b3c07-b75a-47a7-861b-a6f1176dece5" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>full_scale_wake_speed(<span class="dv">10</span>,<span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.8</code></pre>
+</div>
+</div>
+</section>
+<section id="scale-correlation-factor" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="scale-correlation-factor"><span class="header-section-number">4.5</span> Scale correlation factor</h3>
+<p>The scale correlation factor is simply the re-arranged fullscale wake fraction. And is shown as</p>
+<p><span class="math display">\[e_i = \frac{1-w_S}{1-w_M},\]</span> where values are the same as previously.</p>
+<p><strong>ITTC equation</strong>: J-21</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L59" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="scale_correlation_factor" class="level3" data-number="4.6">
+<h3 data-number="4.6" class="anchored" data-anchor-id="scale_correlation_factor"><span class="header-section-number">4.6</span> scale_correlation_factor</h3>
+<blockquote class="blockquote">
+<pre><code> scale_correlation_factor (trial:float, model:float)</code></pre>
+</blockquote>
+<p><em>Calcualte the scale correlation factor using the model fraction from tank tests, and the full-scale fraction from trials</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>trial</td>
+<td>float</td>
+<td>The full-scale wake fraction in the trial</td>
+</tr>
+<tr class="even">
+<td>model</td>
+<td>float</td>
+<td>The wake fraction of the model derived from tank tests</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>The dimensionless coefficient joining the full scale and model fractions</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Deriving the scale correlation factor is easy given the inputs</p>
+<div id="97b3bd58-29c4-4bb1-8eeb-50f54b683286" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>scale_correlation_factor(<span class="fl">0.6</span>,<span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>2.0000000000000004</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="self-propulsion-factors" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="self-propulsion-factors"><span class="header-section-number">5</span> Self propulsion factors</h2>
+<p>This function allows for ship factors to be adjust accounting for the difference between ideal/model conditions and the conditions during the trial. This function is equivalent to equation J-6 to J-8. The function is essentially the following equation</p>
+<p><span class="math display">\[x_{test} = x_{ideal} + \Delta x_R (\frac{\Delta R}{R_{ideal}}),\]</span> Where <span class="math inline">\(x\)</span> is the variable to be adjusted <span class="math inline">\(x_{ideal}\)</span> is the value of the variable under ideal conditions, <span class="math inline">\(\Delta x_R\)</span> the coefficient of of change for each unit of <span class="math inline">\(\frac{\Delta R}{R_{ideal}}\)</span>, <span class="math inline">\(\Delta R\)</span> the resistance increase derived from data measured during the sea trial and <span class="math inline">\(R_{ideal}\)</span> is the resistance under ideal conditions. The values of <span class="math inline">\(x_{ideal}\)</span> are obtained from a model test. The value of <span class="math inline">\(\Delta x_R\)</span> is found by fitting a linear model using data gathered during a specific tank tests. The process of obtaining the value of <span class="math inline">\(x_R\)</span> is described in detail in section J.2.</p>
+<p>In practice however, these sets of values are not needed as the deviations are often negligable in comparison to the variation of <span class="math inline">\(\eta_O\)</span>. That using <span class="math display">\[ x_{test} \approx x_{ideal},\]</span> is acceptable</p>
+<p><strong>ITTC equations</strong>: J-6, J-7, J-8</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L67" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="self_propulsion_factors" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="self_propulsion_factors"><span class="header-section-number">5.1</span> self_propulsion_factors</h3>
+<blockquote class="blockquote">
+<pre><code> self_propulsion_factors (x_ideal:float, delta_x:float=0, delta_r:float=1,
+                          delta_r_ideal:float=1)</code></pre>
+</blockquote>
+<p><em>Adjusting the self propulsion factors is only possible if the required model tests have been performed. By default this function returns the ideal value</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>x_ideal</td>
+<td>float</td>
+<td></td>
+<td>The variable in ideal conditions. It is acceptable to use this value without adjustments</td>
+</tr>
+<tr class="even">
+<td>delta_x</td>
+<td>float</td>
+<td>0</td>
+<td>The change per unit of the resistance ratios. Default is 0</td>
+</tr>
+<tr class="odd">
+<td>delta_r</td>
+<td>float</td>
+<td>1</td>
+<td>increase in resistance from ideal conditions</td>
+</tr>
+<tr class="even">
+<td>delta_r_ideal</td>
+<td>float</td>
+<td>1</td>
+<td>Resistance in ideal conditions</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Generally the adjustment for the self propulsion factors will be small. But if available should be applied</p>
+<div id="b9cb16e5-c837-46a6-b281-2ddee9bbd168" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>self_propulsion_factors(<span class="fl">0.8</span>, <span class="fl">0.1</span>, <span class="dv">1000</span>, <span class="dv">10000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.81</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="calculate-thrust-coefficient-torque-coefficient-and-load-factor" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="calculate-thrust-coefficient-torque-coefficient-and-load-factor"><span class="header-section-number">6</span> Calculate Thrust coefficient, Torque coefficient, and Load factor</h2>
+<p>The thrust coefficient, torque coefficient and the load factor provide useful values for calculating the adjusted propeller efficiency. There are several different approaches. All three approaches are described in this sub-section and are used at various points in the process.</p>
+<p>The different approaches are</p>
+<ul>
+<li>The inverse quadratic method</li>
+<li>The quadractic method</li>
+<li>Torque coefficient from water conditions</li>
+<li>Load factor using propeller advance and thrust</li>
+<li>Load factor using resistance</li>
+</ul>
+<section id="the-inverse-quadratic-method" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="the-inverse-quadratic-method"><span class="header-section-number">6.1</span> The inverse quadratic method</h3>
+<p>The inverse quadratic method doesn’t actually calculate the coefficients themselves but using them as the dependent variable of a quadratic curve where the dependent variable is the propeller advance coefficient in the ideal condition. The result is that the coefficients of the quadratic curve can be either be solved to find the point closest to 0 where the line crosses the x-axis. Alternatively the quadratic coefficients are used replacing the propeller advance coefficients in the ideal condition with those of the trial condition, this creates a quadratic equation that return the thrust coefficient in the trial condition. The propeller advance coefficients in the ideal condition are provided by tank tests, usually 10 data points are supplied in order to fit the curve</p>
+<p><span class="math display">\[y = aX^2 + bX +c\]</span></p>
+<p>The coefficients of this model (<span class="math inline">\(a,b,c\)</span>) are not useful inthemselves but are input parameters to other functions for example <a href="https://JonnoB.github.io/pyseatrials/power.html#torque_coef"><code>torque_coef</code></a></p>
+<p>The equation is also used to calculate the thrust coefficient in the trial condition/</p>
+<p><strong>ITTC equations</strong>: J-9, J-10, J-11, J-25, J-26</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L79" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_curve_coefficient" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="get_curve_coefficient"><span class="header-section-number">6.2</span> get_curve_coefficient</h3>
+<blockquote class="blockquote">
+<pre><code> get_curve_coefficient (y:float, x:float)</code></pre>
+</blockquote>
+<p><em>Obtain the coefficients used to calculate the Thrus, and Torque coefficients and the load factor coefficients</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>y</td>
+<td>float</td>
+<td>An array containing the dependent variable coefficient</td>
+</tr>
+<tr class="even">
+<td>x</td>
+<td>float</td>
+<td>An array containing the propeller advance coefficient</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>Returns an array containing model coefficients</strong></td>
+</tr>
+</tbody>
+</table>
+<p>For ship whose model tests give a propeller advance coefficient to thrust coefficent <span class="math inline">\(K\)</span> relationship as shown below, we can (back) calculate the coefficients of the quadratic formula using the get_curve_coefficient function.</p>
+<div id="e2d57ad8-c94e-49c4-ba23-b926a5fb78b7" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> np.linspace(<span class="dv">1</span>,<span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> J<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>J <span class="op">+</span><span class="dv">3</span> <span class="co">#In reality we obviously do not know the coefficients before hand!</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>get_curve_coefficient(K, J)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([1., 2., 3.])</code></pre>
+</div>
+</div>
+<p>When calculating the loading factor coefficients <span class="math inline">\(\tau\)</span> the values for the propeller advance coefficient needs to be inverted</p>
+<div id="074f9f24-733b-41d6-96a1-58077d71066a" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> <span class="dv">1</span><span class="op">/</span>np.linspace(<span class="dv">1</span>,<span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> J<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>J <span class="op">+</span><span class="dv">3</span> <span class="co">#In reality we obviously do not know the coefficients before hand!</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>get_curve_coefficient(K, J)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([1., 2., 3.])</code></pre>
+</div>
+</div>
+</section>
+<section id="the-quadratic-method" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="the-quadratic-method"><span class="header-section-number">6.3</span> The quadratic method</h3>
+<p>The quadratic method assumes you have obtained the coefficients using the inverse quadratic method described previously. This approach simply plugs the value of propeller advance (<span class="math inline">\(J\)</span>) into the equation to return the value of the target coefficients/ factor. This is typically used to calculate the coefficents in the trial condition</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L101" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="quadratic_method" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="quadratic_method"><span class="header-section-number">6.4</span> quadratic_method</h3>
+<blockquote class="blockquote">
+<pre><code> quadratic_method (coefs:float, propeller_advance_coef:float)</code></pre>
+</blockquote>
+<p><em>Calculate the coefficient using a modelled quadratic curve</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>coefs</td>
+<td>float</td>
+<td>An array of the coefficients created by the function get_curve_coefficient</td>
+</tr>
+<tr class="even">
+<td>propeller_advance_coef</td>
+<td>float</td>
+<td>The propeller advance coefficient</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>The target value for the coefficient types entered</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The ITTC use the quadratic method to calculate the thrust coefficient <span class="math inline">\(K_{Qms}\)</span> in the trial condition.</p>
+<div id="cc4b88a3-ff0f-469d-b709-8fa0eed6d53b" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>quadratic_method([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>], <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>11</code></pre>
+</div>
+</div>
+</section>
+<section id="torque-coefficient-from-propeller-state" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="torque-coefficient-from-propeller-state"><span class="header-section-number">6.5</span> Torque coefficient from propeller state</h3>
+<p>The torque coefficient is obtained using</p>
+<p><span class="math display">\[K_Q = \frac{P}{2 \pi \rho n^3 D^5} \eta,\]</span> Where <span class="math inline">\(P\)</span> is power, <span class="math inline">\(n\)</span> is rotations per second, <span class="math inline">\(D\)</span> is shaft diameter and <span class="math inline">\(\eta\)</span> is relative rotative efficiency.</p>
+<p>Generally the torque coefficient for the ideal condition is known through tank tests. However, this equation is also used to find the thrust coeficient during the trial. When the trial thrust coefficient is calculated <span class="math inline">\(P\)</span>, <span class="math inline">\(n\)</span>, and <span class="math inline">\(\eta\)</span> are all from trial data.</p>
+<p><strong>ITTC equations</strong>: J-12</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L110" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="torque_coef" class="level3" data-number="6.6">
+<h3 data-number="6.6" class="anchored" data-anchor-id="torque_coef"><span class="header-section-number">6.6</span> torque_coef</h3>
+<blockquote class="blockquote">
+<pre><code> torque_coef (power:float, shaft_speed:float, diameter:float,
+              efficiency:float, water_density:float=1026)</code></pre>
+</blockquote>
+<p><em>calcualte the torque coefficient under ideal or trial conditions</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>power</td>
+<td>float</td>
+<td></td>
+<td>The delivered power</td>
+</tr>
+<tr class="even">
+<td>shaft_speed</td>
+<td>float</td>
+<td></td>
+<td>measure propeller shaft speed [rev/s]</td>
+</tr>
+<tr class="odd">
+<td>diameter</td>
+<td>float</td>
+<td></td>
+<td>properller_diameter [m]</td>
+</tr>
+<tr class="even">
+<td>efficiency</td>
+<td>float</td>
+<td></td>
+<td>relative rotative efficiency</td>
+</tr>
+<tr class="odd">
+<td>water_density</td>
+<td>float</td>
+<td>1026</td>
+<td>water density [kg/m^3]</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>dimensionless thrust coefficient</strong></td>
+</tr>
+</tbody>
+</table>
+<p>under trial conditions the thrust coefficient is calculated directly</p>
+<div id="6aa902a8-6a16-4420-b589-49edeb69534f" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>torque_coef(<span class="fl">1e4</span>, <span class="dv">50</span>, <span class="fl">1.5</span>, <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>1.3073637822066664e-06</code></pre>
+</div>
+</div>
+</section>
+<section id="load-factor-using-propeller-advance-and-thrust" class="level3" data-number="6.7">
+<h3 data-number="6.7" class="anchored" data-anchor-id="load-factor-using-propeller-advance-and-thrust"><span class="header-section-number">6.7</span> Load factor using propeller advance and thrust</h3>
+<p>The load factor on the propeller can be calculate by</p>
+<p><span class="math display">\[\tau_{P} = \frac{K_{T}}{J^2},\]</span> where <span class="math inline">\(K_{T}\)</span> is the thrust coefficient and <span class="math inline">\(J\)</span> is the propeller advance coefficient. This approach is usally for finding <span class="math inline">\(\tau_{P}\)</span> the trial condition</p>
+<p><strong>ITTC equations</strong>: J-18</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L126" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="load_factor" class="level3" data-number="6.8">
+<h3 data-number="6.8" class="anchored" data-anchor-id="load_factor"><span class="header-section-number">6.8</span> load_factor</h3>
+<blockquote class="blockquote">
+<pre><code> load_factor (thrust_coefficient:float, propeller_advance:float)</code></pre>
+</blockquote>
+<p><em>Calculate the load factor using the thrust and propeller advance coefficients</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>thrust_coefficient</td>
+<td>float</td>
+<td>The thrust coefficient</td>
+</tr>
+<tr class="even">
+<td>propeller_advance</td>
+<td>float</td>
+<td>The propeller advance coefficient</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>dimensionless load factor</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The load factor on the propeller for the given ship conditions is a key element to calculating the corrected power delivered</p>
+<div id="843a8a00-8bfd-4930-b54c-2bc88aad48f5" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>load_factor(<span class="fl">0.8</span>, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.032</code></pre>
+</div>
+</div>
+</section>
+<section id="load-factor-using-resistance-and-propellor-state" class="level3" data-number="6.9">
+<h3 data-number="6.9" class="anchored" data-anchor-id="load-factor-using-resistance-and-propellor-state"><span class="header-section-number">6.9</span> Load factor using resistance and propellor state</h3>
+<p>This approach to calculating the loading factors are <span class="math display">\[ \tau = \frac{R}{(1- t)(1-w_S)^2 \rho V^2_S D^2},\]</span> where <span class="math inline">\(R\)</span> is the total resistance, <span class="math inline">\(t\)</span> is the thrust deduction factor, <span class="math inline">\(w_S4\)</span> is the full-scale wake fraction, <span class="math inline">\(\rho\)</span> is the water density, <span class="math inline">\(V_S\)</span> is the ship speed through water, and <span class="math inline">\(D\)</span> is the diameter of the propeller. This equation is the same as <a href="https://JonnoB.github.io/pyseatrials/power.html#total_resistance"><code>total_resistance</code></a> but re-arranged to find <span class="math inline">\(\tau\)</span>.</p>
+<p><strong>ITTC equations</strong>: J-23</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L135" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="load_factor_resistance" class="level3" data-number="6.10">
+<h3 data-number="6.10" class="anchored" data-anchor-id="load_factor_resistance"><span class="header-section-number">6.10</span> load_factor_resistance</h3>
+<blockquote class="blockquote">
+<pre><code> load_factor_resistance (resistance:float, thrust_deduction:float,
+                         wake_fraction:float, stw:float, diameter:float,
+                         water_density:float=1026)</code></pre>
+</blockquote>
+<p><em>Calculate the load factor of the propeller. Usually used to find the load factor in the ideal condition</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>resistance</td>
+<td>float</td>
+<td></td>
+<td>The total resistance experienced by the vessel</td>
+</tr>
+<tr class="even">
+<td>thrust_deduction</td>
+<td>float</td>
+<td></td>
+<td>The thrust deduction factor</td>
+</tr>
+<tr class="odd">
+<td>wake_fraction</td>
+<td>float</td>
+<td></td>
+<td>The full-scale wake fraction</td>
+</tr>
+<tr class="even">
+<td>stw</td>
+<td>float</td>
+<td></td>
+<td>Ships speed through water [m/s]</td>
+</tr>
+<tr class="odd">
+<td>diameter</td>
+<td>float</td>
+<td></td>
+<td>The diameter of the ships propeller</td>
+</tr>
+<tr class="even">
+<td>water_density</td>
+<td>float</td>
+<td>1026</td>
+<td>density of water in the given conditions [kg/m^3]</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>this value can be in the ideal condition or trial depending on parameters used</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The load factor using resistance allow the load factor in the ideal condition to be calculated using only basic information</p>
+<div id="92bb11c5-2b87-41c2-a832-c342ebf3b1da" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>load_factor_resistance(<span class="fl">1e4</span>, <span class="fl">0.7</span>, <span class="fl">0.8</span>, <span class="dv">10</span>, <span class="fl">2.3</span>, <span class="dv">1026</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>1.5353794413921111</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="trial-propeller-advance" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="trial-propeller-advance"><span class="header-section-number">7</span> Trial propeller advance</h2>
+<p>The propeller advance coefficient for the trial conditions can be calculated by factorising the coefficients of the quadratic curve founs using <a href="https://JonnoB.github.io/pyseatrials/power.html#get_curve_coefficient"><code>get_curve_coefficient</code></a>. The factorisation is the standard quadratic method using</p>
+<p><span class="math display">\[J = \frac{-b - \sqrt{b^2 -4a(c - K_Q)}}{2a},\]</span> or <span class="math display">\[J = \frac{-b - \sqrt{b^2 -4(a- \tau)c}}{2(a- \tau)},\]</span> where <span class="math inline">\(a,b,\)</span> and <span class="math inline">\(c\)</span> are the ouput coefficients from <a href="https://JonnoB.github.io/pyseatrials/power.html#get_curve_coefficient"><code>get_curve_coefficient</code></a> and <span class="math inline">\(K_Q\)</span> is the torque coefficient calculated using <a href="https://JonnoB.github.io/pyseatrials/power.html#torque_coef"><code>torque_coef</code></a>, and <span class="math inline">\(\tau\)</span> is the load factor. Note that the propeller advance is only the negative part of the quadratic equation as properller advance must always be positive. This equation is used to derive the propeller advance coefficient from empirical measurements.</p>
+<p><strong>ITTC equations</strong>: J-13, J-24</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L149" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="propeller_advance_coefficient" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="propeller_advance_coefficient"><span class="header-section-number">7.1</span> propeller_advance_coefficient</h3>
+<blockquote class="blockquote">
+<pre><code> propeller_advance_coefficient (propeller_value:float, a:float, b:float,
+                                c:float, mode:str)</code></pre>
+</blockquote>
+<p><em>Calculate the propeller advance coefficient using a quadratic curve</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>propeller_value</td>
+<td>float</td>
+<td>The torque coefficient or loading factor as appropriate</td>
+</tr>
+<tr class="even">
+<td>a</td>
+<td>float</td>
+<td>coefficient ‘a’ from get_curve_coefficient</td>
+</tr>
+<tr class="odd">
+<td>b</td>
+<td>float</td>
+<td>coefficient ‘b’ from get_curve_coefficient</td>
+</tr>
+<tr class="even">
+<td>c</td>
+<td>float</td>
+<td>coefficient ‘c’ from get_curve_coefficient</td>
+</tr>
+<tr class="odd">
+<td>mode</td>
+<td>str</td>
+<td>Does function use torque or load mode?</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The propeller advance can then be calcualted by combining outputs of the previous functions <a href="https://JonnoB.github.io/pyseatrials/power.html#get_curve_coefficient"><code>get_curve_coefficient</code></a> and <a href="https://JonnoB.github.io/pyseatrials/power.html#torque_coef"><code>torque_coef</code></a> as inputs to <a href="https://JonnoB.github.io/pyseatrials/power.html#propeller_advance_coefficient"><code>propeller_advance_coefficient</code></a>.</p>
+<div id="73cef29d-c85b-464a-bb8a-a839c3c173d5" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#These values are obviously not realistic</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> np.linspace(<span class="dv">1</span>,<span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>J<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="op">-</span><span class="dv">5</span><span class="op">*</span>J <span class="op">+</span><span class="dv">3</span> <span class="co">#In reality we obviously do not know the coefficients before hand!</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>curve_coefs <span class="op">=</span> get_curve_coefficient(K, J)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>trial_torque_coef <span class="op">=</span> torque_coef(<span class="fl">1e4</span>, <span class="dv">50</span>, <span class="fl">1.5</span>, <span class="fl">0.8</span>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>propeller_advance_coefficient(trial_torque_coef, curve_coefs[<span class="dv">0</span>], curve_coefs[<span class="dv">1</span>], curve_coefs[<span class="dv">2</span>], mode <span class="op">=</span><span class="st">'torque'</span>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.9999986926396782</code></pre>
+</div>
+</div>
+<p>Remember when calulating the propeller advance using load factors the coefficients used are not those from the load quadratic method but from Thrust</p>
+<div id="b791eb77-24e3-452e-864e-356066b17d92" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">#when I have some example data show that thrust is used not torque</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>propeller_advance_coefficient(trial_torque_coef, curve_coefs[<span class="dv">0</span>], curve_coefs[<span class="dv">1</span>], curve_coefs[<span class="dv">2</span>], mode <span class="op">=</span><span class="st">'load'</span>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.9999986926430968</code></pre>
+</div>
+</div>
+<div id="cbec62af-fbb1-4dad-8952-89b640f869c2" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>propeller_advance_coefficient(<span class="dv">0</span>, <span class="dv">2</span>, <span class="op">-</span><span class="dv">5</span>, <span class="dv">3</span>, mode <span class="op">=</span> <span class="st">"load"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>1.0</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="open-water-efficiency" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="open-water-efficiency"><span class="header-section-number">8</span> Open water efficiency</h2>
+<p>The efficiency of the properller in open water can be calcualted using</p>
+<p><span class="math display">\[\eta_O = \frac{J}{2 \pi}\frac{K_T}{K_Q},\]</span> where J is the propeller advance coefficient, <span class="math inline">\(K_T\)</span> is the thrust coefficient, and <span class="math inline">\(K_Q\)</span> is the torque coefficient. It can be used for calulating both the trial conditions, but is typically used for trial conditions as the ideal conditions are known from tank tests.</p>
+<p><strong>ITTC equations</strong>: J-15, J-27</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L174" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="open_water_efficiency" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="open_water_efficiency"><span class="header-section-number">8.1</span> open_water_efficiency</h3>
+<blockquote class="blockquote">
+<pre><code> open_water_efficiency (propeller_advance_coef:float, thrust_coef:float,
+                        torque_coef:float)</code></pre>
+</blockquote>
+<p><em>Calculate the open water propeller efficiency</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>propeller_advance_coef</td>
+<td>float</td>
+<td>The propeller advance coefficient of the ship</td>
+</tr>
+<tr class="even">
+<td>thrust_coef</td>
+<td>float</td>
+<td>thrust coefficient</td>
+</tr>
+<tr class="odd">
+<td>torque_coef</td>
+<td>float</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The proppeller open water efficiency for a ship with a propeller advance coefficent of 5, thrust coefficent of 0.8 and torque coefficient of 0.9. Is shown below</p>
+<div id="70c1fd1b-3d25-47c8-b14f-0b59aa7f5449" class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>open_water_efficiency(<span class="dv">5</span>, <span class="fl">0.8</span>, <span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>0.707355302630646</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="speed-of-flow-into-the-propeller" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="speed-of-flow-into-the-propeller"><span class="header-section-number">9</span> Speed of flow into the propeller</h2>
+<p>The rate at which water flows past the propeller is given by</p>
+<p><span class="math display">\[V_A = JnD,\]</span> where <span class="math inline">\(J\)</span> is the propeller advance coefficient, <span class="math inline">\(n\)</span> is the rotations per second, and <span class="math inline">\(D\)</span> is the diameter of the propeller. When calculating the speed under trial conditions the propeller advance coefficieant can be found using <a href="https://JonnoB.github.io/pyseatrials/power.html#propeller_advance_coefficient"><code>propeller_advance_coefficient</code></a></p>
+<p><strong>ITTC equations</strong>: J-16</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L184" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="propeller_flow" class="level3" data-number="9.1">
+<h3 data-number="9.1" class="anchored" data-anchor-id="propeller_flow"><span class="header-section-number">9.1</span> propeller_flow</h3>
+<blockquote class="blockquote">
+<pre><code> propeller_flow (propeller_advance_coef:float, rotations_sec:float,
+                 diameter:float)</code></pre>
+</blockquote>
+<p><em>Calculate speed of water flow into the propeller</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>propeller_advance_coef</td>
+<td>float</td>
+<td>Propeller advance coefficient [n/a]</td>
+</tr>
+<tr class="even">
+<td>rotations_sec</td>
+<td>float</td>
+<td>propeller rotations per second [rev/sec]</td>
+</tr>
+<tr class="odd">
+<td>diameter</td>
+<td>float</td>
+<td>Diamter of the propeller [m]</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>The value that comes out is in m3/s WHAT ARE THE UNITS?</strong></td>
+</tr>
+</tbody>
+</table>
+<p>really the propeller advance coefficient function is just a simple wrapper around the product of three values</p>
+<div id="02050de1-06d4-405d-8879-f2e69b6fd14e" class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>propeller_flow(<span class="dv">5</span>, <span class="dv">30</span>, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>300</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="total-resistance" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="total-resistance"><span class="header-section-number">10</span> Total Resistance</h2>
+<p>The total resistance (R) encountered by a ship system can be calculated using the following formula:</p>
+<p><span class="math display">\[R = \tau(1- t)(1-w_S)^2 \rho V^2_S D^2,\]</span> where <span class="math inline">\(\tau\)</span> is the loading factor, <span class="math inline">\(t\)</span> is the thrust deduction factor, <span class="math inline">\(w_S4\)</span> is the full-scale wake fraction, <span class="math inline">\(\rho\)</span> is the water density, <span class="math inline">\(V_S\)</span> is the ship speed through water, and <span class="math inline">\(D\)</span> is the diameter of the propeller. This equation is typically used to calculate the resistance in the trial conditions and is the same as <a href="https://JonnoB.github.io/pyseatrials/power.html#load_factor_resistance"><code>load_factor_resistance</code></a> but rearranged to get <span class="math inline">\(R\)</span>. It should be noted that the equation is analogous to calculating propeller thrust under stable conditions, as such the equation assumes a single propeller. In cases where multiple identical propellers are present, the total resistance can be calculated as follows: <span class="math inline">\(R = \sum_1^m R_i = R_i * m\)</span>, where <span class="math inline">\(R_i\)</span> is the total resistance of a single propeller and <span class="math inline">\(m\)</span> is the total number of propellers (usually two)</p>
+<p>The total resistance in the trial conditions is used to calculate the resistance in the ideal conditions, using the following formula.<span class="math display">\[R_{id} = R_{ms} - \Delta R,\]</span> where <span class="math inline">\(R_{ms}\)</span> is the resistance in the trial conditions, <span class="math inline">\(\Delta R\)</span> is the resistance created by the wind, wave, and water.</p>
+<p><strong>ITTC equations</strong>: J-19</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L195" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="total_resistance" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="total_resistance"><span class="header-section-number">10.1</span> total_resistance</h3>
+<blockquote class="blockquote">
+<pre><code> total_resistance (load_factor:float, thrust_deduction:float,
+                   wake_fraction:float, stw:float, diameter:float,
+                   water_density:float=1026)</code></pre>
+</blockquote>
+<p><em>Calculate the total resistance of the ship. Used to find the resistance in the ideal condition</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>load_factor</td>
+<td>float</td>
+<td></td>
+<td>The load factor</td>
+</tr>
+<tr class="even">
+<td>thrust_deduction</td>
+<td>float</td>
+<td></td>
+<td>The thrust deduction factor</td>
+</tr>
+<tr class="odd">
+<td>wake_fraction</td>
+<td>float</td>
+<td></td>
+<td>The full-scale wake fraction</td>
+</tr>
+<tr class="even">
+<td>stw</td>
+<td>float</td>
+<td></td>
+<td>Ships speed through water [m/s]</td>
+</tr>
+<tr class="odd">
+<td>diameter</td>
+<td>float</td>
+<td></td>
+<td>The diameter of the ships propeller</td>
+</tr>
+<tr class="even">
+<td>water_density</td>
+<td>float</td>
+<td>1026</td>
+<td>density of water in the given conditions [kg/m^3]</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>this value can be in the ideal condition or trial depending on parameters used</strong></td>
+</tr>
+</tbody>
+</table>
+<p>total resistance of the ship ultimately decides it’s maximum speed and the fuel consumption it has at a given speed</p>
+<div id="f2f6a386-365f-473a-8626-9b1c71ecd3ee" class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>total_resistance(<span class="dv">5</span>, <span class="fl">0.7</span>, <span class="fl">0.8</span>, <span class="dv">10</span>, <span class="fl">2.3</span>, <span class="dv">1026</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>32565.23999999998</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="corrected-propeller-shaft-speed" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="corrected-propeller-shaft-speed"><span class="header-section-number">11</span> Corrected propeller shaft speed</h2>
+<p>The corrected propeller shaft speed is <span class="math display">\[n = \frac{V_S(1-w_{S})}{JD},\]</span> where <span class="math inline">\(V_s\)</span> is the speed of the vessel, <span class="math inline">\(w_S\)</span> is the full-scale wake fraction, <span class="math inline">\(J\)</span> is the propeller advance coefficient in the ideal condition, and <span class="math inline">\(D\)</span> is the diameter of the propeller. This equation is is a re-arranged version of <a href="https://JonnoB.github.io/pyseatrials/power.html#propeller_flow"><code>propeller_flow</code></a> with the substitution <span class="math inline">\(V_A = V_S (1-w_S)\)</span></p>
+<p><strong>ITTC equations</strong>: J-28</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L209" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="propeller_speed" class="level3" data-number="11.1">
+<h3 data-number="11.1" class="anchored" data-anchor-id="propeller_speed"><span class="header-section-number">11.1</span> propeller_speed</h3>
+<blockquote class="blockquote">
+<pre><code> propeller_speed (propeller_advance_coef:float, stw:float, diameter:float,
+                  wake_fraction:float)</code></pre>
+</blockquote>
+<p><em>Calculate the propeller speed in m/s</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>propeller_advance_coef</td>
+<td>float</td>
+<td>Propeller advance coefficient [n/a]</td>
+</tr>
+<tr class="even">
+<td>stw</td>
+<td>float</td>
+<td>The speed through water of the vessel [m/s]</td>
+</tr>
+<tr class="odd">
+<td>diameter</td>
+<td>float</td>
+<td>Diamter of the propeller [m]</td>
+</tr>
+<tr class="even">
+<td>wake_fraction</td>
+<td>float</td>
+<td>The full scale wake fraction</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>Propeller speed in rotations per second</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Once calculated propeller speed can be inserted into the beggining of the calculation process to iterate the model to convergence and find the final value for <span class="math inline">\(\Delta P\)</span></p>
+<div id="7fe6f0ad-b01e-40fb-be6e-abe8a6bbd9a7" class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>propeller_speed(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>, <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>1.25</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="power-in-the-ideal-conditions" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="power-in-the-ideal-conditions"><span class="header-section-number">12</span> Power in the ideal conditions</h2>
+<p>After finding all the intermediary stages the final corrected power values can be calcualted. <span class="math display">\[P_{Did} = P_{Dms} - \Delta P\]</span></p>
+<p>The calulation of these values is broken into two stages</p>
+<ul>
+<li>Trial: The calculations needed to get all the values relating to and required for values ‘in the trial condition’</li>
+<li>Ideal: The calculations needed to get all the values relating to and required for values ‘in the ideal condition’</li>
+</ul>
+<p>The trial values are calculated first then the results are used to calculate the ideal values. once both phases have been completed the delivered power in the ideal condition can be found.</p>
+<section id="calculate-values-in-the-trial-condition" class="level3" data-number="12.1">
+<h3 data-number="12.1" class="anchored" data-anchor-id="calculate-values-in-the-trial-condition"><span class="header-section-number">12.1</span> Calculate values in the trial condition</h3>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L220" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="calculate_all_values_from_trial_phase" class="level3" data-number="12.2">
+<h3 data-number="12.2" class="anchored" data-anchor-id="calculate_all_values_from_trial_phase"><span class="header-section-number">12.2</span> calculate_all_values_from_trial_phase</h3>
+<blockquote class="blockquote">
+<pre><code> calculate_all_values_from_trial_phase (V_s:float, P_dms:float,
+                                        eta_ms:float, delta_R:float,
+                                        delta_eta:float, delta_t:float,
+                                        delta_w:float, shaft_speed:float,
+                                        diameter:float, t_Rid:float,
+                                        w_Mid:float, number_shafts:float,
+                                        K_T, K_Q, J,
+                                        water_density:float=1026)</code></pre>
+</blockquote>
+<p><em>Perform all the calculations to get the ‘trials conditions’ values</em></p>
+<p>Completing the trial phase values returns a dictionary of values. If vectors are entered instead of floats then a dictionary of arrays is returned. Using this structure makes converting the output of the function in a pandas dataframe straightforword.</p>
+<p>As the output is all scalers an index must be passed to the dataframe commend. The index be the same length as the vectors returned by <a href="https://JonnoB.github.io/pyseatrials/power.html#calculate_all_values_from_trial_phase"><code>calculate_all_values_from_trial_phase</code></a>.</p>
+<div id="43c0e641-e454-42c1-b935-25005f0d2472" class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>trial_values, K_coeffs <span class="op">=</span> calculate_all_values_from_trial_phase(</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>            V_s <span class="op">=</span> <span class="fl">8.8</span>,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>            P_dms <span class="op">=</span> <span class="dv">13500</span>,</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>            eta_ms <span class="op">=</span> <span class="fl">1.018</span>,</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>            delta_R <span class="op">=</span> <span class="op">-</span><span class="dv">44000</span>,</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>            delta_eta  <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>            delta_t <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>            delta_w <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>            shaft_speed <span class="op">=</span> <span class="fl">1.35</span>, </span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>            diameter <span class="op">=</span><span class="dv">6</span>,</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>            number_shafts <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>            water_density <span class="op">=</span> <span class="dv">1023</span>,</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>            t_Rid <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>            w_Mid <span class="op">=</span> <span class="fl">0.24</span>,</span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>            J <span class="op">=</span> np.linspace(<span class="fl">0.3</span>, <span class="fl">0.85</span>, <span class="dv">12</span>),</span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>            K_T <span class="op">=</span> np.asarray([<span class="fl">0.30</span>, <span class="fl">0.27</span>, <span class="fl">0.26</span>, <span class="fl">0.24</span>, <span class="fl">0.21</span>, <span class="fl">0.20</span>, <span class="fl">0.195</span>, <span class="fl">0.17</span>, <span class="fl">0.15</span>, <span class="fl">0.13</span>, <span class="fl">0.09</span>, <span class="fl">0.08</span>]),</span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>            K_Q <span class="op">=</span> np.asarray([<span class="fl">0.38</span>,<span class="fl">0.36</span>,<span class="fl">0.34</span>,<span class="fl">0.32</span>,<span class="fl">0.30</span>,<span class="fl">0.28</span>,<span class="fl">0.26</span>,<span class="fl">0.23</span>,<span class="fl">0.21</span>,<span class="fl">0.20</span>,<span class="fl">0.16</span>,<span class="fl">0.13</span>])<span class="op">/</span><span class="dv">10</span></span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-19"><a href="#cb56-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-20"><a href="#cb56-20" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(trial_values, index <span class="op">=</span> [<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">K_Qms</th>
+<th data-quarto-table-cell-role="th">J_ms</th>
+<th data-quarto-table-cell-role="th">K_Tms</th>
+<th data-quarto-table-cell-role="th">tau_Pms</th>
+<th data-quarto-table-cell-role="th">V_A</th>
+<th data-quarto-table-cell-role="th">w_Sms</th>
+<th data-quarto-table-cell-role="th">R_ms</th>
+<th data-quarto-table-cell-role="th">R_id</th>
+<th data-quarto-table-cell-role="th">eta_Oms</th>
+<th data-quarto-table-cell-role="th">eta_Rms</th>
+<th data-quarto-table-cell-role="th">t_ms</th>
+<th data-quarto-table-cell-role="th">w_Mms</th>
+<th data-quarto-table-cell-role="th">eta_Dms</th>
+<th data-quarto-table-cell-role="th">e_ims</th>
+<th data-quarto-table-cell-role="th">w_Sid</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.000056</td>
+<td>1.084483</td>
+<td>-0.032797</td>
+<td>-0.027887</td>
+<td>8.78431</td>
+<td>0.001783</td>
+<td>-126796.729393</td>
+<td>-82796.729393</td>
+<td>-101.3081</td>
+<td>1.018</td>
+<td>0.2</td>
+<td>0.24</td>
+<td>-82.652683</td>
+<td>1.313443</td>
+<td>0.001783</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-values-in-the-ideal-condition" class="level3" data-number="12.3">
+<h3 data-number="12.3" class="anchored" data-anchor-id="calculate-values-in-the-ideal-condition"><span class="header-section-number">12.3</span> Calculate values in the ideal condition</h3>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L292" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="calculate_all_values_from_ideal_phase" class="level3" data-number="12.4">
+<h3 data-number="12.4" class="anchored" data-anchor-id="calculate_all_values_from_ideal_phase"><span class="header-section-number">12.4</span> calculate_all_values_from_ideal_phase</h3>
+<blockquote class="blockquote">
+<pre><code> calculate_all_values_from_ideal_phase (V_s:float, P_dms:float,
+                                        delta_R:float, diameter:float,
+                                        number_shafts:float, t_Rid:float,
+                                        R_id:float, eta_Rms:float,
+                                        eta_Dms:float, w_Sid:float,
+                                        K_T_coeffs, K_Q_coeffs,
+                                        water_density:float=1026)</code></pre>
+</blockquote>
+<p><em>intermediary function that calculates all the values in the ideal condition</em></p>
+<p>In most cases the function will take the output of <a href="https://JonnoB.github.io/pyseatrials/power.html#calculate_all_values_from_trial_phase"><code>calculate_all_values_from_trial_phase</code></a>. However there may be cases where some variables will be substituted. In the case below the total resistance in the ideal condition <span class="math inline">\(R_{id}\)</span> has been repplaced with another value with the rest of the values unchanged</p>
+<div id="d21853a8-a8ba-4445-abea-024002908eec" class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>ideal_values <span class="op">=</span> calculate_all_values_from_ideal_phase(</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>            V_s <span class="op">=</span> <span class="fl">8.8</span>,</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>            P_dms <span class="op">=</span> <span class="dv">13500</span>,</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>            delta_R <span class="op">=</span> <span class="op">-</span><span class="dv">44000</span>,</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>            diameter <span class="op">=</span><span class="dv">6</span>,</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>            number_shafts <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>            t_Rid <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>            R_id<span class="op">=</span> <span class="fl">1.4e6</span>, <span class="co">#trial_values['R_id'], #R_id is replaced with a different value </span></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>            eta_Rms<span class="op">=</span>trial_values[<span class="st">'eta_Rms'</span>],</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>            eta_Dms<span class="op">=</span>trial_values[<span class="st">'eta_Dms'</span>],</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>            w_Sid<span class="op">=</span>trial_values[<span class="st">'w_Sid'</span>],</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>            K_T_coeffs <span class="op">=</span>  K_coeffs[<span class="dv">0</span>],</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>            K_Q_coeffs <span class="op">=</span>  K_coeffs[<span class="dv">1</span>],</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>            water_density <span class="op">=</span> <span class="dv">1026</span></span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>ideal_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'tau_Pid': 0.5608892942446079,
+ 'J_id': 0.5839954628056303,
+ 'K_Tid': 0.19129168674857802,
+ 'K_Qid': 0.026521344043699324,
+ 'eta_Oid': 0.6703940820835084,
+ 'n_id': 1.8547261579189114,
+ 'eta_Did': 0.7392819259246924,
+ 'delta_P': 300871.69313356787}</code></pre>
+</div>
+</div>
+<p>However, it should be remembered that data can be entered as an array resulting with an array being returned. Also remember that the functions will perform broadcasting automatically.</p>
+<div id="ae667994-8b7d-4767-a216-f5eac029d72c" class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>ideal_values <span class="op">=</span> calculate_all_values_from_ideal_phase(</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>            V_s <span class="op">=</span> <span class="fl">8.8</span>,</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>            P_dms <span class="op">=</span> <span class="dv">13500</span>,</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>            delta_R <span class="op">=</span> <span class="op">-</span><span class="dv">44000</span>,</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>            diameter <span class="op">=</span><span class="dv">6</span>,</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>            number_shafts <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>            t_Rid <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>            R_id<span class="op">=</span> np.array([<span class="fl">1.8e6</span>, <span class="fl">1.4e6</span>, trial_values[<span class="st">'R_id'</span>] ]),</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>            eta_Rms<span class="op">=</span>trial_values[<span class="st">'eta_Rms'</span>],</span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>            eta_Dms<span class="op">=</span>trial_values[<span class="st">'eta_Dms'</span>],</span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>            w_Sid<span class="op">=</span>trial_values[<span class="st">'w_Sid'</span>],</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>            K_T_coeffs <span class="op">=</span>  K_coeffs[<span class="dv">0</span>],</span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>            K_Q_coeffs <span class="op">=</span>  K_coeffs[<span class="dv">1</span>],</span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>            water_density <span class="op">=</span> <span class="dv">1026</span></span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(ideal_values, index <span class="op">=</span> [<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">tau_Pid</th>
+<th data-quarto-table-cell-role="th">J_id</th>
+<th data-quarto-table-cell-role="th">K_Tid</th>
+<th data-quarto-table-cell-role="th">K_Qid</th>
+<th data-quarto-table-cell-role="th">eta_Oid</th>
+<th data-quarto-table-cell-role="th">n_id</th>
+<th data-quarto-table-cell-role="th">eta_Did</th>
+<th data-quarto-table-cell-role="th">delta_P</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.721143</td>
+<td>0.538156</td>
+<td>0.208851</td>
+<td>0.028523</td>
+<td>0.627159</td>
+<td>2.012711</td>
+<td>0.691604</td>
+<td>320682.544239</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.560889</td>
+<td>0.583995</td>
+<td>0.191292</td>
+<td>0.026521</td>
+<td>0.670394</td>
+<td>1.854726</td>
+<td>0.739282</td>
+<td>300871.693134</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>-0.009672</td>
+<td>1.039962</td>
+<td>-0.010461</td>
+<td>0.002753</td>
+<td>-0.628948</td>
+<td>1.041530</td>
+<td>-0.693577</td>
+<td>-292808.768684</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="power-delivered-in-the-ideal-condition" class="level3" data-number="12.5">
+<h3 data-number="12.5" class="anchored" data-anchor-id="power-delivered-in-the-ideal-condition"><span class="header-section-number">12.5</span> Power delivered in the ideal condition</h3>
+<p>This function brings all the rest of the functions in this module together into a single function call. Generally it would be easiest to use this. However, in the case that iteration is necessary, creating a custom function with a loop would be better. Such functionality may added to the library later as its use is better understood</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/power.py#L332" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="delivered_power_ideal_condition" class="level3" data-number="12.6">
+<h3 data-number="12.6" class="anchored" data-anchor-id="delivered_power_ideal_condition"><span class="header-section-number">12.6</span> delivered_power_ideal_condition</h3>
+<blockquote class="blockquote">
+<pre><code> delivered_power_ideal_condition (V_s:float, P_dms:float, eta_ms:float,
+                                  delta_R:float, delta_eta:float,
+                                  delta_t:float, delta_w:float,
+                                  shaft_speed:float, diameter:float,
+                                  t_Rid:float, w_Mid:float,
+                                  number_shafts:float, K_T, K_Q, J,
+                                  water_density:float=1026)</code></pre>
+</blockquote>
+<p><em>Calculate the delivered power in the Ideal conditions</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>V_s</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P_dms</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>eta_ms</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>delta_R</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>delta_eta</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>delta_t</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>delta_w</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>shaft_speed</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>diameter</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>t_Rid</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>w_Mid</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>number_shafts</td>
+<td>float</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>K_T</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>K_Q</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>J</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>water_density</td>
+<td>float</td>
+<td>1026</td>
+<td>returns three results ideal_values, trial_values and the K coefficients</td>
+</tr>
+</tbody>
+</table>
+<p>Although this function produces a lot of output. Most can be ingored or used for checking results.</p>
+<div id="e6e2f0ca-8609-4a84-b169-28f1883b3d92" class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>ideal_values, trial_values, K_coeffs <span class="op">=</span> delivered_power_ideal_condition(</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>            V_s <span class="op">=</span> <span class="fl">8.8</span>,</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>            P_dms <span class="op">=</span> <span class="dv">13500</span>,</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>            eta_ms <span class="op">=</span> <span class="fl">1.018</span>,</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>            delta_R <span class="op">=</span> <span class="op">-</span><span class="dv">44000</span>,</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>            delta_eta  <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>            delta_t <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>            delta_w <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>            shaft_speed <span class="op">=</span> <span class="fl">1.35</span>, </span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>            diameter <span class="op">=</span><span class="dv">6</span>,</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>            number_shafts <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>            water_density <span class="op">=</span> <span class="dv">1023</span>,</span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>            t_Rid <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>            w_Mid <span class="op">=</span> <span class="fl">0.24</span>,</span>
+<span id="cb62-15"><a href="#cb62-15" aria-hidden="true" tabindex="-1"></a>            J <span class="op">=</span> np.linspace(<span class="fl">0.3</span>, <span class="fl">0.85</span>, <span class="dv">12</span>),</span>
+<span id="cb62-16"><a href="#cb62-16" aria-hidden="true" tabindex="-1"></a>            K_T <span class="op">=</span> np.asarray([<span class="fl">0.30</span>, <span class="fl">0.27</span>, <span class="fl">0.26</span>, <span class="fl">0.24</span>, <span class="fl">0.21</span>, <span class="fl">0.20</span>, <span class="fl">0.195</span>, <span class="fl">0.17</span>, <span class="fl">0.15</span>, <span class="fl">0.13</span>, <span class="fl">0.09</span>, <span class="fl">0.08</span>]),</span>
+<span id="cb62-17"><a href="#cb62-17" aria-hidden="true" tabindex="-1"></a>            K_Q <span class="op">=</span> np.asarray([<span class="fl">0.38</span>,<span class="fl">0.36</span>,<span class="fl">0.34</span>,<span class="fl">0.32</span>,<span class="fl">0.30</span>,<span class="fl">0.28</span>,<span class="fl">0.26</span>,<span class="fl">0.23</span>,<span class="fl">0.21</span>,<span class="fl">0.20</span>,<span class="fl">0.16</span>,<span class="fl">0.13</span>])<span class="op">/</span><span class="dv">10</span></span>
+<span id="cb62-18"><a href="#cb62-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb62-19"><a href="#cb62-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-20"><a href="#cb62-20" aria-hidden="true" tabindex="-1"></a>ideal_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'tau_Pid': -0.018209572919191754,
+ 'J_id': 1.0600094727983314,
+ 'K_Tid': -0.02046064182433527,
+ 'K_Qid': 0.0015466896077949155,
+ 'eta_Oid': -2.2317521577870694,
+ 'n_id': 1.3811684700285562,
+ 'eta_Did': -1.8207853408921804,
+ 'delta_P': -386663.16162853956}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="how-it-all-hangs-together" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="how-it-all-hangs-together"><span class="header-section-number">13</span> How it all hangs together</h2>
+<p>The relationships between the direct power equations are pretty complicated. The below flow diagram can help understand how it all hangs together</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[Hard edge] --&gt; B(Round edge)
+  B --&gt; C{Decision}
+  C --&gt; D[Result one]
+  C --&gt; E[Result two]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<div id="9b080f78-c6eb-496c-952f-61af2bec724c" class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> nbdev<span class="op">;</span> nbdev.nbdev_export()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/JonnoB\.github\.io\/pyseatrials");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

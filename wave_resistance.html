@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Functions for calculating the forces on the ship due to waves">
+
+<title>Wave Resistance (wave) – pyseatrials</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ebc57992554dae5230fa85c1bd5a55fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Wave Resistance (wave) – pyseatrials">
+<meta property="og:description" content="Functions for calculating the forces on the ship due to waves">
+<meta property="og:image" content="https://JonnoB.github.io/pyseatrials/03_wave_resistance_files/figure-html/cell-11-output-1.png">
+<meta property="og:site_name" content="pyseatrials">
+<meta property="og:image:height" content="428">
+<meta property="og:image:width" content="547">
+<meta name="twitter:title" content="Wave Resistance (wave) – pyseatrials">
+<meta name="twitter:description" content="Functions for calculating the forces on the ship due to waves">
+<meta name="twitter:image" content="https://JonnoB.github.io/pyseatrials/03_wave_resistance_files/figure-html/cell-11-output-1.png">
+<meta name="twitter:image-height" content="428">
+<meta name="twitter:image-width" content="547">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pyseatrials</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./wave_resistance.html">Wave Resistance (wave)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">pyseatrials</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./general_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">General Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluation of wind data (wind)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wave_resistance.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wave Resistance (wave)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Direct Power Analysis (power)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind_resistance_coef.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wind resistance coefficients (wind_res)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./current.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Current Correction (current)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./shallow_water.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shallow water corrections (shallow)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./full_example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Which ship is best?</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./trig.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Useful trigonometry (trig)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic_hydro_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Basic hydro functions (basic)</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#stawave-1" id="toc-stawave-1" class="nav-link active" data-scroll-target="#stawave-1"><span class="header-section-number">1</span> STAWAVE-1</a>
+  <ul class="collapse">
+  <li><a href="#stawave1_fn" id="toc-stawave1_fn" class="nav-link" data-scroll-target="#stawave1_fn"><span class="header-section-number">1.1</span> stawave1_fn</a></li>
+  </ul></li>
+  <li><a href="#the-modified-pierson-moskowitz-spectrum" id="toc-the-modified-pierson-moskowitz-spectrum" class="nav-link" data-scroll-target="#the-modified-pierson-moskowitz-spectrum"><span class="header-section-number">2</span> The modified Pierson-Moskowitz spectrum</a>
+  <ul class="collapse">
+  <li><a href="#modified_pierson_moskowitz_spectrum" id="toc-modified_pierson_moskowitz_spectrum" class="nav-link" data-scroll-target="#modified_pierson_moskowitz_spectrum"><span class="header-section-number">2.1</span> modified_pierson_moskowitz_spectrum</a></li>
+  </ul></li>
+  <li><a href="#stawave-2" id="toc-stawave-2" class="nav-link" data-scroll-target="#stawave-2"><span class="header-section-number">3</span> STAWAVE-2</a>
+  <ul class="collapse">
+  <li><a href="#r_awl" id="toc-r_awl" class="nav-link" data-scroll-target="#r_awl"><span class="header-section-number">3.1</span> R_AWL</a></li>
+  <li><a href="#calculate_r_wave" id="toc-calculate_r_wave" class="nav-link" data-scroll-target="#calculate_r_wave"><span class="header-section-number">3.2</span> calculate_R_wave</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Wave Resistance (wave)</h1>
+</div>
+
+<div>
+  <div class="description">
+    Functions for calculating the forces on the ship due to waves
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>This section provides the functions necessary to calculate the resistance caused by waves</p>
+<section id="stawave-1" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="stawave-1"><span class="header-section-number">1</span> STAWAVE-1</h2>
+<p>STAWAVE-1 s a simplficied method for ship experiencing limited heave and pitch it was developed by Boom, 2013, and is a practical solution due to its low calculation complexity and relatively small number of variables.</p>
+<p>STAWAVE-1 has been validated and can be applied when following conditions are met</p>
+<ul>
+<li>Heave and Pitch are small with the vertical acceleration of the bow <span class="math inline">\(&lt;0.05g \approx 0.49ms^{-2}\)</span></li>
+<li>Thee wave direction <span class="math inline">\(x\)</span> is between <span class="math inline">\(-45^\circ &lt;x &lt; -45^\circ\)</span></li>
+</ul>
+<p><strong>ITTC equations</strong>: G-1</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wave.py#L13" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="stawave1_fn" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="stawave1_fn"><span class="header-section-number">1.1</span> stawave1_fn</h3>
+<blockquote class="blockquote">
+<pre><code> stawave1_fn (beam:float, wave_height:float, length:float,
+              water_density:float=1026, gravity:float=9.81)</code></pre>
+</blockquote>
+<p><em>STAWAVE-1 finds the resistance caused by bow waves for ships experiencing low heave and pitch</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>beam</td>
+<td>float</td>
+<td></td>
+<td>the beam of the ship [m]</td>
+</tr>
+<tr class="even">
+<td>wave_height</td>
+<td>float</td>
+<td></td>
+<td>Significant wave height of wind waves [m]</td>
+</tr>
+<tr class="odd">
+<td>length</td>
+<td>float</td>
+<td></td>
+<td>The length of the bow on the water line [m]. See documentation for more details</td>
+</tr>
+<tr class="even">
+<td>water_density</td>
+<td>float</td>
+<td>1026</td>
+<td>this should be for the current temperature and salinity [kg/m^3]</td>
+</tr>
+<tr class="odd">
+<td>gravity</td>
+<td>float</td>
+<td>9.81</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td></td>
+<td><strong>Wave resistance [kg*m/s^2]</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="33f91252-c4ab-447d-9dde-7b1a4d44dd39" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stawave1_fn(beam <span class="op">=</span> <span class="dv">20</span>, wave_height <span class="op">=</span> <span class="dv">1</span>, length <span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>25162.65</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="the-modified-pierson-moskowitz-spectrum" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-modified-pierson-moskowitz-spectrum"><span class="header-section-number">2</span> The modified Pierson-Moskowitz spectrum</h2>
+<p>In order to calcualte the force exerted on the vessel by the waves, the wave spectra must be calculate. For this the modified Pierson-Moskowitz spectrum [XXXcitationxxx] algorithm is typically used.</p>
+<p><span class="math display">\[S_\eta(\omega) =\frac{A_{fw}}{\omega^5} \textrm{exp}(-\frac{B_{fw}}{\omega^4})\]</span></p>
+<p><span class="math display">\[A_{fw} = 173\frac{H_{W1/3}^2}{T_{01}^4}\]</span></p>
+<p><span class="math display">\[B_{fw} = \frac{691}{T_{01}^4}\]</span></p>
+<p>Where</p>
+<ul>
+<li><span class="math inline">\(\omega\)</span> is the circular frequency of regular waves</li>
+<li><span class="math inline">\(H_{W1/3}\)</span> is the significant wave height of swell and wind waves</li>
+<li><span class="math inline">\(T_{01}\)</span> is the wave encounter period</li>
+</ul>
+<p><strong>ITTC equations</strong>: 10</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wave.py#L28" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="modified_pierson_moskowitz_spectrum" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="modified_pierson_moskowitz_spectrum"><span class="header-section-number">2.1</span> modified_pierson_moskowitz_spectrum</h3>
+<blockquote class="blockquote">
+<pre><code> modified_pierson_moskowitz_spectrum (omega:float, H_W1_3:float)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>omega</td>
+<td>float</td>
+<td>The circular frequency [rads/s]</td>
+</tr>
+<tr class="even">
+<td>H_W1_3</td>
+<td>float</td>
+<td>Significant wave height of Wind and Swell waves [m]</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>float</strong></td>
+<td><strong>The energy density spectrum at the point omega [s]</strong></td>
+</tr>
+</tbody>
+</table>
+<p>As an example of the modified pierson moskowitz spectrum consider the case below</p>
+<div id="60cc4d0c" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>omega <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>H_W1_3 <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>T_01 <span class="op">=</span> <span class="fl">5.0</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>S_eta <span class="op">=</span> modified_pierson_moskowitz_spectrum(omega, H_W1_3)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(S_eta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.28499477886766</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="stawave-2" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="stawave-2"><span class="header-section-number">3</span> STAWAVE-2</h2>
+<p>The resistance experienced by the ship from waves is calulated using the below process</p>
+<p>Wave transfer function is given by <span class="math display">\[R_{wave} = R_{AWRL} + R_{AWML}\]</span></p>
+<p>Where</p>
+<p><span class="math display">\[ R_{AWML} = \frac{4 \rho_s g \zeta_A^2B^2}{ L_{pp} }\bar{r}_{aw}(\omega)   \]</span></p>
+<p>with</p>
+<p><span class="math display">\[\bar{r}_{aw}(\omega) = \bar{\omega}^{b_1} \textrm{exp}\left\{ \frac{b_1}{d_1}(1 - \omega^{-d_1}) \right\} a_1 \textrm{Fr}^{1.5} \textrm{exp}(3.50 \textrm{Fr})\]</span></p>
+<p><span class="math display">\[\bar{\omega} = \frac{\sqrt{\frac{L_{pp}}{g}}\sqrt[3]{k_{yy}}}{1.17 \textrm{Fr}^{-0.143}}\omega\]</span></p>
+<p><span class="math display">\[a_1 = 60.3 C_B^{1.34} \]</span></p>
+<p><span class="math display">\[b_1 = \begin{cases} 11.0 &amp; \bar{\omega}&lt;1  \\ -8.5 &amp; \bar{\omega}\geq1 \end{cases}\]</span></p>
+<p><span class="math display">\[d_1 = \begin{cases} 14.0 &amp; \bar{\omega}&lt;1  \\ -566(\frac{L_{pp}}{B})^{-2.66} &amp; \bar{\omega}\geq1 \end{cases}\]</span></p>
+<p><span class="math display">\[ R_{AWRL} = \frac{1}{2} \rho_s g \zeta_A^2B \alpha_1(\omega) \]</span></p>
+<p><span class="math display">\[ \alpha_1(\omega) = \frac{\pi^2 I_1^2 ( 1.5 k T_M ) }{ \pi^2 I_1^2 ( 1.5 k T_M ) + K_1^2 ( 1.5 k T_M ) }f_1 \]</span></p>
+<p><span class="math display">\[ f_1 = 0.692 \left( \frac{V_S}{\sqrt{T_M g}} \right)^{0.769} + 1.81 C_B^{6.95} \]</span></p>
+<p>once R_{AWRL}$, and <span class="math inline">\(R_{AWML}\)</span>$ are obtained then the added resistance to the ship can be found by integrating the below equation. <span class="math display">\[R_{AWL} = 2\int_{0}^{\infty} \frac{R_{wave}}{\zeta_A^2}S_{\eta}(\omega)d\omega\]</span></p>
+<p>Where the variables of the above equations are</p>
+<ul>
+<li><span class="math inline">\(B\)</span> Beam of ship</li>
+<li><span class="math inline">\(\rho_s\)</span> water density at current ship conditions</li>
+<li><span class="math inline">\(g\)</span> force of gravity</li>
+<li><span class="math inline">\(Fr\)</span> Froude number</li>
+<li><span class="math inline">\(\omega\)</span> wave frequency</li>
+<li><span class="math inline">\(k\)</span> ciruclar wave number in rads/s</li>
+<li><span class="math inline">\(S_eta\)</span> frequency spectrum of ocean waves. JONSWAP or ther methods can be used as appropriate.</li>
+<li><span class="math inline">\(C_B\)</span> block coefficient</li>
+<li><span class="math inline">\(V_s\)</span> ships speed in m/s</li>
+<li><span class="math inline">\(k_{yy}\)</span> non-dimensional radius of gyration in the lateral direction</li>
+<li><span class="math inline">\(L_{pp}\)</span> ship length between perpendiculars</li>
+<li><span class="math inline">\(T_M\)</span> draught at midship</li>
+<li><span class="math inline">\(I_t\)</span> modified Bessel Function of the first kind of order 1</li>
+<li><span class="math inline">\(K_t\)</span> modified Bessel Function of the second kind of order 1</li>
+<li><span class="math inline">\(\zeta_A\)</span> The amplitude of the wave/significant wave height</li>
+</ul>
+<p><strong>ITTC equations</strong>: G-12</p>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wave.py#L105" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="r_awl" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="r_awl"><span class="header-section-number">3.1</span> R_AWL</h3>
+<blockquote class="blockquote">
+<pre><code> R_AWL (zeta_A:float, B:float, L_pp:float, V_s:float, T_M:float,
+        C_B:float, k_yy:float, Fr:float, k:float, rho_s:float=1025,
+        g:float=9.81, S_eta:object=None, **kwargs)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>zeta_A</td>
+<td>float</td>
+<td></td>
+<td>wave amplitude [m]</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>float</td>
+<td></td>
+<td>ship breadth [m]</td>
+</tr>
+<tr class="odd">
+<td>L_pp</td>
+<td>float</td>
+<td></td>
+<td>Length between perpendiculars [m]</td>
+</tr>
+<tr class="even">
+<td>V_s</td>
+<td>float</td>
+<td></td>
+<td>speed through water [m/s]</td>
+</tr>
+<tr class="odd">
+<td>T_M</td>
+<td>float</td>
+<td></td>
+<td>draught at midship [m]</td>
+</tr>
+<tr class="even">
+<td>C_B</td>
+<td>float</td>
+<td></td>
+<td>block coefficient [dimensionless]</td>
+</tr>
+<tr class="odd">
+<td>k_yy</td>
+<td>float</td>
+<td></td>
+<td>radius of gyration in the lateral direction [dimensionless]</td>
+</tr>
+<tr class="even">
+<td>Fr</td>
+<td>float</td>
+<td></td>
+<td>Froude number [dimensionless]</td>
+</tr>
+<tr class="odd">
+<td>k</td>
+<td>float</td>
+<td></td>
+<td>circular wave number [rads/m]</td>
+</tr>
+<tr class="even">
+<td>rho_s</td>
+<td>float</td>
+<td>1025</td>
+<td>water density [kg/m^3]</td>
+</tr>
+<tr class="odd">
+<td>g</td>
+<td>float</td>
+<td>9.81</td>
+<td>accerleation due to gravity [m/s^2]</td>
+</tr>
+<tr class="even">
+<td>S_eta</td>
+<td>object</td>
+<td>None</td>
+<td>A function calculating the wave spectrum</td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>tuple</strong></td>
+<td></td>
+<td><strong>The added wave resistance, the wave resistance from reflection, the wave resistsance from pitching</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/JonnoB/pyseatrials/blob/main/pyseatrials/wave.py#L76" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="calculate_r_wave" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="calculate_r_wave"><span class="header-section-number">3.2</span> calculate_R_wave</h3>
+<blockquote class="blockquote">
+<pre><code> calculate_R_wave (omega:float, C_B:float, L_pp:float, k_yy:float,
+                   Fr:float, zeta_A:float, B:float, k:float, T_M:float,
+                   V_s:float, rho_s:float=1025, g:float=9.81)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>omega</td>
+<td>float</td>
+<td></td>
+<td>circular wave frequency [rads/s]</td>
+</tr>
+<tr class="even">
+<td>C_B</td>
+<td>float</td>
+<td></td>
+<td>block coefficient [dimensionless]</td>
+</tr>
+<tr class="odd">
+<td>L_pp</td>
+<td>float</td>
+<td></td>
+<td>Length between perpendiculars [m]</td>
+</tr>
+<tr class="even">
+<td>k_yy</td>
+<td>float</td>
+<td></td>
+<td>radius of gyration in the lateral direction [dimensionless]</td>
+</tr>
+<tr class="odd">
+<td>Fr</td>
+<td>float</td>
+<td></td>
+<td>Froude number [dimensionless]</td>
+</tr>
+<tr class="even">
+<td>zeta_A</td>
+<td>float</td>
+<td></td>
+<td>wave amplitude [m]</td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td>float</td>
+<td></td>
+<td>ship breadth [m]</td>
+</tr>
+<tr class="even">
+<td>k</td>
+<td>float</td>
+<td></td>
+<td>circular wave number [rads/m]</td>
+</tr>
+<tr class="odd">
+<td>T_M</td>
+<td>float</td>
+<td></td>
+<td>draught at midship [m]</td>
+</tr>
+<tr class="even">
+<td>V_s</td>
+<td>float</td>
+<td></td>
+<td>speed through water [m/s]</td>
+</tr>
+<tr class="odd">
+<td>rho_s</td>
+<td>float</td>
+<td>1025</td>
+<td>water density [kg/m^3]</td>
+</tr>
+<tr class="even">
+<td>g</td>
+<td>float</td>
+<td>9.81</td>
+<td>acceleration due to gravity [m/s^2]</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>tuple</strong></td>
+<td></td>
+<td><strong>Function outputs the wave transfer function as well as the component parts R_AWRL and R_AWML</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="b682db30" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ship parameters</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>L_pp <span class="op">=</span> <span class="dv">250</span>  <span class="co"># meters</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>V_s <span class="op">=</span> <span class="dv">10</span>  <span class="co"># meters per second</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>beaufort_scale <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>Fr <span class="op">=</span> <span class="fl">0.3</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Example values for other parameters (adjust based on the specific ship)</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>omega <span class="op">=</span> <span class="fl">0.3</span> <span class="co"># circular wave frequency [rads/s]</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> <span class="fl">9.81</span>  <span class="co"># m/s^2, force of gravity</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> omega <span class="op">*</span> g <span class="co"># circular wave number [rads/m]</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>rho_s <span class="op">=</span> <span class="dv">1025</span>  <span class="co"># kg/m^3, water density</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>zeta_A <span class="op">=</span> <span class="dv">1</span>  <span class="co"># meters, significant wave height</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> <span class="dv">32</span>  <span class="co"># meters, beam of the ship</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>C_B <span class="op">=</span> <span class="fl">0.7</span>  <span class="co"># block coefficient</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>T_M <span class="op">=</span> <span class="dv">12</span>  <span class="co"># meters, draught at midship</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>k_yy <span class="op">=</span> <span class="fl">0.25</span>  <span class="co"># non-dimensional radius of gyration in the lateral direction</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>I_1 <span class="op">=</span> iv(<span class="dv">1</span>, <span class="fl">1.5</span> <span class="op">*</span> k <span class="op">*</span> T_M)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>K_1 <span class="op">=</span> kn(<span class="dv">1</span>,  <span class="fl">1.5</span> <span class="op">*</span> k <span class="op">*</span> T_M) </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate R_wave</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>R_wave <span class="op">=</span> calculate_R_wave(omega, C_B, L_pp, k_yy, Fr, zeta_A, B, k, T_M, V_s, rho_s, g)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>R_wave</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(229776.13823059603, 128975.85056996053, 100800.2876606355)</code></pre>
+</div>
+</div>
+<div id="ec6139a3" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>R_AWL(zeta_A, B, L_pp, V_s, T_M, C_B, k_yy, Fr, k, rho_s, g, S_eta <span class="op">=</span> modified_pierson_moskowitz_spectrum, H_W1_3 <span class="op">=</span> zeta_A)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(14670.472278183037, 8072.656348988186, 6597.815929194849)</code></pre>
+</div>
+</div>
+<div id="3fd4534d" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="1a741558" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>transfer_function <span class="op">=</span> <span class="kw">lambda</span> omega: (calculate_R_wave(omega <span class="op">=</span> omega, C_B <span class="op">=</span> C_B, L_pp <span class="op">=</span> L_pp, k_yy <span class="op">=</span> k_yy, </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                                                    Fr <span class="op">=</span> Fr , zeta_A <span class="op">=</span> zeta_A, B <span class="op">=</span> B, k <span class="op">=</span> k, T_M <span class="op">=</span> T_M, V_s <span class="op">=</span> V_s, rho_s <span class="op">=</span> rho_s, g <span class="op">=</span> g))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>multipliers <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">2</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">4</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">8</span>]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>pierson2 <span class="op">=</span> <span class="kw">lambda</span> omega: modified_pierson_moskowitz_spectrum(omega, H_W1_3)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="fl">0.1</span>, <span class="dv">3</span>, <span class="dv">1000</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> (np.array([transfer_function(z) <span class="cf">for</span> z <span class="kw">in</span> x]))</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>y2 <span class="op">=</span> (np.array([pierson2(z) <span class="cf">for</span> z <span class="kw">in</span> x]))</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>ax.plot(x, y, linewidth<span class="op">=</span><span class="fl">2.0</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03_wave_resistance_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/JonnoB\.github\.io\/pyseatrials");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/JonnoB/pyseatrials/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
