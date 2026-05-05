@@ -1,7 +1,9 @@
-from pkg_resources import parse_version
+from packaging.version import parse as parse_version
+# from pkg_resources import parse_version # no longer required
 from configparser import ConfigParser
 import setuptools
 assert parse_version(setuptools.__version__)>=parse_version('36.2')
+
 
 # note: all settings are in settings.ini; edit there, not here
 config = ConfigParser(delimiters=['='])
@@ -44,7 +46,7 @@ setuptools.setup(
     package_data={"": ["datasets/*.csv", "wind_coef_data/*.csv", "water_properties/*.csv"]},#manually added
     install_requires = requirements,
     extras_require={ 'dev': dev_requirements },
-    dependency_links = cfg.get('dep_links','').split(),
+    # dependency_links = cfg.get('dep_links','').split(),
     python_requires  = '>=' + cfg['min_python'],
     long_description = open('README.md').read(),
     long_description_content_type = 'text/markdown',
