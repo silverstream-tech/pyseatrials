@@ -76,12 +76,25 @@ def double_run_average(a, b, alpha, beta):
     return average_velocity/2, average_direction
 
 # %% ../nbs/02_wind.ipynb 47
-def vertical_position_anemometer(true_wind_speed:float, #True windspeed [m/s]
-                                 reference_height:float, #reference height [m]
-                                 measured_height:float  # measured height [m]
-                                )-> float: #The true windspeed corrected for measurement height
-    
-    "Adjusts the windspeed taking into account the height of the anemometer on the ship relative to the reference height for windspeed"
+def vertical_position_anemometer(true_wind_speed:float, #True wind speed measured at the anemometer. Knots or m/s
+                                 reference_height:float, #Reference height above sea level the wind is corrected to [m]
+                                 measured_height:float, #Height of the anemometer above sea level [m]
+                                 exponent:float = 1/9 #Exponent of the wind profile power law
+                                )-> float: #True wind speed at the reference height, in the units of `true_wind_speed`
+    """Adjusts the wind speed to account for the height of the anemometer on the ship relative to the
+    reference height for wind speed.
 
-    
-    return true_wind_speed * (reference_height/measured_height)**(1/9)
+    The correction applies the wind profile power law given in ITTC E-8, scaling the measured wind speed
+    by the ratio of the reference height to the measurement height, raised to `exponent`. The default
+    exponent of 1/9 is the ITTC value; it is exposed so that an alternative profile can be used where a
+    standard other than ITTC applies.
+
+    `measured_height` is the height of the anemometer above the *sea surface*, not above the keel or the
+    baseline. For a vessel in service it is the anemometer height above baseline less the mean draught,
+    and it therefore changes with loading condition.
+
+    Because the height ratio is dimensionless, the function is unit-agnostic: the corrected wind speed is
+    returned in whatever units `true_wind_speed` was supplied in, knots or m/s.
+    """
+
+    return true_wind_speed * (reference_height/measured_height)**(exponent)
