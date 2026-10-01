@@ -1,0 +1,1 @@
+Sitemap: https://JonnoB.github.io/pyseatrials/sitemap.xml
